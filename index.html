@@ -19,10 +19,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Firebase Compatibility SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -73,19 +69,21 @@
       scrollbar-width: none;
     }
   
-    html { scroll-behavior: smooth; }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-    @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes pop { from { opacity: 0; transform: scale(.96) translateY(6px); } to { opacity: 1; transform: none; } }
-    .tab-content:not(.hidden), .note-in { animation: fadeUp .3s ease both; }
-    .modal-backdrop:not(.hidden) { animation: fade .15s ease both; }
-    .modal-backdrop:not(.hidden) > div { animation: pop .2s ease both; }
-    .glass-card.modal-box { max-height: 90vh; overflow-y: auto; }
-    button, select, input, textarea { transition: border-color .15s, background-color .15s, box-shadow .15s, transform .1s; }
-    input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px rgba(99, 102, 241, .18); }
-    button:active:not(:disabled) { transform: scale(.97); }
-    select, input[type=date], input[type=datetime-local] { color-scheme: dark; }
-    @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+    html{scroll-behavior:smooth}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    @keyframes fade{from{opacity:0}to{opacity:1}}
+    @keyframes pop{from{opacity:0;transform:scale(.96) translateY(6px)}to{opacity:1;transform:none}}
+    .tab-content:not(.hidden),.note-in{animation:fadeUp .3s ease both}
+    .fixed.inset-0.z-50:not(.hidden){animation:fade .15s ease both}
+    .fixed.inset-0.z-50:not(.hidden)>div{animation:pop .2s ease both}
+    .glass-card.max-w-md,.glass-card.max-w-lg{max-height:92vh;overflow-y:auto}
+    td.flex{display:table-cell;vertical-align:middle}
+    td.flex>*{display:inline-block;vertical-align:middle;margin-right:.5rem}
+    button,select,input,textarea{transition:border-color .15s,background-color .15s,box-shadow .15s,transform .1s}
+    input:focus,select:focus,textarea:focus{box-shadow:0 0 0 3px rgba(99,102,241,.18)}
+    button:active:not(:disabled){transform:scale(.97)}
+    select,input[type=date],input[type=datetime-local]{color-scheme:dark}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
   </style>
 </head>
 <body class="h-full flex flex-col font-sans bg-slate-950 text-slate-100 overflow-x-hidden selection:bg-indigo-500 selection:text-white">
@@ -119,8 +117,8 @@
         <!-- Right Controls & Sync Status -->
         <div class="flex items-center gap-3">
           <div id="sync-status">
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <i class="fa-solid fa-cloud text-xs"></i> Firebase Active
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+              <i class="fa-solid fa-database text-xs"></i> Local Storage Active
             </span>
           </div>
 
@@ -141,7 +139,7 @@
         </button>
         <button onclick="switchTab('notes')" id="tab-notes" class="tab-btn px-3.5 py-2 text-xs font-semibold rounded-lg transition flex items-center gap-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 shrink-0">
           <i class="fa-solid fa-note-sticky text-cyan-400"></i> Notes & Requirements
-          <span id="notes-badge" class="hidden min-w-[18px] h-[18px] px-1 rounded-full bg-cyan-500 text-slate-950 text-[10px] font-extrabold items-center justify-center">0</span>
+          <span id="notes-badge" class="hidden min-w-[18px] h-[18px] px-1 rounded-full bg-cyan-500 text-slate-950 text-[10px] font-extrabold items-center justify-center"></span>
         </button>
         <button onclick="switchTab('meetings')" id="tab-meetings" class="tab-btn px-3.5 py-2 text-xs font-semibold rounded-lg transition flex items-center gap-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 shrink-0">
           <i class="fa-solid fa-calendar-days text-emerald-400"></i> Meeting Planner
@@ -361,6 +359,7 @@
             <h2 class="text-base font-bold text-white flex items-center gap-2"><i class="fa-solid fa-note-sticky text-cyan-400"></i> Notes & Requirements</h2>
             <p class="text-xs text-slate-400">Shared team to-dos. Whoever finishes one adds their name and marks it completed.</p>
           </div>
+          <div id="notes-banner"></div>
         </div>
         <form onsubmit="handleAddNote(event)" class="flex flex-col md:flex-row gap-2">
           <input id="note-text" required maxlength="300" autocomplete="off" placeholder="Write a note or requirement..." class="flex-1 w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
@@ -422,7 +421,7 @@
             <option value="Contacted">Contacted</option>
             <option value="Pitch Sent">Pitch Sent</option>
             <option value="Meeting Scheduled">Meeting Scheduled</option>
-            <option value="Closed-Won">Closed-Won</option>
+            <option value="Closed-Won">Closed-Won 🏆</option>
             <option value="Closed-Lost">Closed-Lost</option>
           </select>
         </div>
@@ -517,1036 +516,1563 @@
 
     <!-- TAB 6: GEMINI AI ASSISTANT -->
     <div id="view-gemini" class="tab-content hidden space-y-6">
-      <div class="glass-card p-6 rounded-xl border border-slate-800 space-y-5">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center font-bold text-lg">
-            <i class="fa-solid fa-robot"></i>
-          </div>
-          <div>
-            <h2 class="text-base font-bold text-white">Gemini AI Sponsorship Co-Pilot</h2>
-            <p class="text-xs text-slate-400">Generate custom pitch proposals, follow-up emails, and PKR pricing packages.</p>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="space-y-4">
+          <div class="glass-card p-5 rounded-xl border border-slate-800 space-y-4">
+            <div class="flex items-center gap-2">
+              <div class="p-2 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                <i class="fa-solid fa-wand-magic-sparkles text-lg"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-white">Gemini Sponsorship Co-Pilot</h3>
+                <p class="text-[11px] text-slate-400">Instant AI tools in PKR context</p>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <button onclick="useGeminiTemplate('zero')" class="w-full text-left p-3 rounded-lg bg-slate-900 hover:bg-amber-950/40 border border-slate-800 hover:border-amber-500/40 transition group">
+                <div class="text-xs font-semibold text-amber-300 group-hover:text-amber-200 flex items-center justify-between">
+                  <span><i class="fa-solid fa-compass-drafting mr-2"></i> Day 0 Action Plan (PKR)</span>
+                  <i class="fa-solid fa-chevron-right text-[10px] opacity-60"></i>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-1">Checklist to launch a sponsorship drive in Pakistan.</p>
+              </button>
+
+              <button onclick="useGeminiTemplate('meeting_invite')" class="w-full text-left p-3 rounded-lg bg-slate-900 hover:bg-emerald-950/40 border border-slate-800 hover:border-emerald-500/40 transition group">
+                <div class="text-xs font-semibold text-emerald-300 group-hover:text-emerald-200 flex items-center justify-between">
+                  <span><i class="fa-solid fa-calendar-check mr-2"></i> Corporate Meeting Invite</span>
+                  <i class="fa-solid fa-chevron-right text-[10px] opacity-60"></i>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-1">Draft email requesting a 15-minute pitch call.</p>
+              </button>
+
+              <button onclick="useGeminiTemplate('packages')" class="w-full text-left p-3 rounded-lg bg-slate-900 hover:bg-cyan-950/40 border border-slate-800 hover:border-cyan-500/40 transition group">
+                <div class="text-xs font-semibold text-cyan-300 group-hover:text-cyan-200 flex items-center justify-between">
+                  <span><i class="fa-solid fa-layer-group mr-2"></i> PKR Package Tiers Breakdown</span>
+                  <i class="fa-solid fa-chevron-right text-[10px] opacity-60"></i>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-1">Title, Gold, Silver tier deliverables in PKR.</p>
+              </button>
+            </div>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="space-y-3">
-            <div>
-              <label class="block text-xs font-semibold text-slate-300 mb-1">Target Company Name</label>
-              <input type="text" id="ai-company" placeholder="e.g. Gourmet Foods / Foodpanda / Systems Ltd" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+        <div class="lg:col-span-2 glass-card rounded-xl border border-slate-800 flex flex-col h-[560px]">
+          <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/80 rounded-t-xl">
+            <div class="flex items-center gap-2">
+              <span class="relative flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
+              </span>
+              <span class="text-xs font-bold text-white">Gemini AI Assistant</span>
             </div>
-
-            <div>
-              <label class="block text-xs font-semibold text-slate-300 mb-1">Select Goal / Document Type</label>
-              <select id="ai-doc-type" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
-                <option value="pitch">Cold Sponsorship Pitch Email</option>
-                <option value="followup">Gentle Follow-Up Email</option>
-                <option value="tiers">Tier Benefits Matrix (Title, Gold, Silver in PKR)</option>
-                <option value="objection">Handling Sponsorship Rejection / Budget Limit</option>
-              </select>
-            </div>
-
-            <button onclick="generateGeminiPitch()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg text-xs shadow-lg shadow-indigo-600/30 transition flex items-center justify-center gap-2">
-              <i class="fa-solid fa-sparkles text-amber-300"></i> Draft Proposal with Gemini AI
+            <button onclick="clearGeminiChat()" class="text-xs text-slate-400 hover:text-white transition">
+              <i class="fa-solid fa-trash-can mr-1"></i> Clear Chat
             </button>
           </div>
 
-          <div class="space-y-1">
-            <label class="block text-xs font-semibold text-slate-300">AI Draft Output</label>
-            <textarea id="ai-output" readonly rows="8" placeholder="Generated draft will appear here..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs text-slate-300 focus:outline-none font-mono"></textarea>
+          <div id="gemini-chat-body" class="flex-1 p-4 overflow-y-auto space-y-4">
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-lg bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-robot text-sm"></i>
+              </div>
+              <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl rounded-tl-none max-w-2xl text-xs leading-relaxed text-slate-200 space-y-2">
+                <p class="font-bold text-indigo-300">Salam Team! 👋</p>
+                <p>I am your Gemini AI Sponsorship Advisor calibrated for events in Pakistan (PKR). Ask me to draft corporate emails, outline budget requirements, or design tier packages!</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-3 border-t border-slate-800 bg-slate-900/90 rounded-b-xl flex gap-2">
+            <textarea id="gemini-input" rows="2" placeholder="Ask Gemini to draft meeting invites or structure sponsorship packages in PKR..." class="flex-1 bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 resize-none"></textarea>
+            <button onclick="sendGeminiPrompt()" id="gemini-send-btn" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold text-xs transition flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-paper-plane mr-1.5"></i> Ask
+            </button>
           </div>
         </div>
       </div>
     </div>
-
   </main>
 
-  <!-- MODALS -->
+  <!-- MODALS SECTION -->
 
-  <!-- Settings Modal (Hardcoded Config Display) -->
-  <div id="settings-modal" class="modal-backdrop fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="glass-card modal-box w-full max-w-md p-6 rounded-2xl border border-slate-800 space-y-5">
+  <!-- MODAL: Requirement -->
+  <div id="add-requirement-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-card max-w-md w-full rounded-xl border border-slate-800 shadow-2xl p-6 space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="font-bold text-white text-sm flex items-center gap-2">
-          <i class="fa-solid fa-gear text-indigo-400"></i> Hub Settings & Goal Config
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-list-check text-cyan-400"></i> Add Event Requirement
         </h3>
-        <button onclick="closeModal('settings-modal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        <button onclick="closeModal('add-requirement-modal')" class="text-slate-400 hover:text-white transition">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
       </div>
 
-      <form onsubmit="saveSettings(event)" class="space-y-4">
+      <form id="requirement-form" onsubmit="handleSaveRequirement(event)" class="space-y-3">
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Required Event Goal (PKR)</label>
-          <input type="number" id="settings-target" required min="1000" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Currency Symbol</label>
-          <input type="text" id="settings-currency" required value="Rs. " class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Sprint Days Remaining</label>
-          <input type="number" id="settings-days" required min="1" max="365" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
-        </div>
-
-        <!-- Hardcoded Firebase Status Card (Replaced User Config Box) -->
-        <div class="pt-2 border-t border-slate-800">
-          <div class="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg flex items-center gap-3">
-            <div class="w-8 h-8 rounded-md bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-              <i class="fa-solid fa-cloud-check text-sm"></i>
-            </div>
-            <div>
-              <h4 class="text-xs font-bold text-emerald-300">Firebase Live Sync Active</h4>
-              <p class="text-[10px] text-slate-400 mt-0.5">Database pre-configured. Team updates sync automatically in real time.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex justify-end gap-2 pt-2">
-          <button type="button" onclick="closeModal('settings-modal')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg">Cancel</button>
-          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg shadow-lg shadow-indigo-600/30">Save Settings</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Add Requirement Modal -->
-  <div id="add-requirement-modal" class="modal-backdrop fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="glass-card modal-box w-full max-w-md p-6 rounded-2xl border border-slate-800 space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="font-bold text-white text-sm">Add Event Requirement</h3>
-        <button onclick="closeModal('add-requirement-modal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-
-      <form onsubmit="handleAddRequirement(event)" class="space-y-3">
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Requirement Title</label>
-          <input type="text" id="req-title" required placeholder="e.g. Auditorium Sound System Rental" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Item Name *</label>
+          <input type="text" id="req-name" required placeholder="e.g., Auditorium Hall Rent, Refreshments" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-slate-300 mb-1">Category</label>
-            <select id="req-category" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
-              <option value="Venue & AV">Venue & AV</option>
-              <option value="Refreshments / Food">Refreshments / Food</option>
-              <option value="Marketing & Printing">Marketing & Printing</option>
-              <option value="Guest Honorarium">Guest Honorarium</option>
-              <option value="Shields & Merchandise">Shields & Merchandise</option>
-              <option value="Other Expenses">Other Expenses</option>
-            </select>
+            <select id="req-category" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500"></select>
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Type</label>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Sponsorship Type</label>
             <select id="req-type" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
-              <option value="Cash">Cash Needed</option>
-              <option value="In-Kind">In-Kind Product</option>
+              <option value="Cash">Cash Funding</option>
+              <option value="In-Kind">In-Kind / Product</option>
             </select>
           </div>
         </div>
 
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Estimated Cost (Rs.)</label>
-          <input type="number" id="req-cost" required min="0" placeholder="50000" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Estimated Cost (Rs.) *</label>
+            <input type="number" id="req-cost" required min="0" step="500" placeholder="50000" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Status</label>
+            <select id="req-status" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+              <option value="Needed">Needed (Unfunded)</option>
+              <option value="In Discussion">In Sponsor Discussion</option>
+              <option value="Secured">Secured 🏆</option>
+            </select>
+          </div>
         </div>
 
-        <div class="flex justify-end gap-2 pt-2">
-          <button type="button" onclick="closeModal('add-requirement-modal')" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs font-semibold rounded-lg">Cancel</button>
-          <button type="submit" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-lg">Add Requirement</button>
+        <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+          <button type="button" onclick="closeModal('add-requirement-modal')" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs rounded-lg font-semibold hover:bg-slate-700 transition">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-cyan-600 text-white text-xs rounded-lg font-bold hover:bg-cyan-500 transition">Save Item</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Add Lead Modal -->
-  <div id="add-lead-modal" class="modal-backdrop fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="glass-card modal-box w-full max-w-md p-6 rounded-2xl border border-slate-800 space-y-4">
+  <!-- MODAL: Meeting -->
+  <div id="add-meeting-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-card max-w-lg w-full rounded-xl border border-slate-800 shadow-2xl p-6 space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="font-bold text-white text-sm" id="lead-modal-title">Add Sponsor Lead</h3>
-        <button onclick="closeModal('add-lead-modal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-calendar-plus text-emerald-400"></i> Schedule Pitch Meeting
+        </h3>
+        <button onclick="closeModal('add-meeting-modal')" class="text-slate-400 hover:text-white transition">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
       </div>
 
-      <form onsubmit="handleAddLead(event)" class="space-y-3">
-        <input type="hidden" id="lead-edit-id">
-
+      <form id="meeting-form" onsubmit="handleSaveMeeting(event)" class="space-y-3">
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Company / Brand Name</label>
-          <input type="text" id="lead-company" required placeholder="e.g. Systems Limited / Nestlé" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Sponsor / Company Name *</label>
+          <input type="text" id="meeting-company" required placeholder="e.g., Jazz, Systems Ltd, Nestle" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Target Tier</label>
-            <select id="lead-tier" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
-              <option value="Title Sponsor">Title Sponsor</option>
-              <option value="Gold Sponsor">Gold Sponsor</option>
-              <option value="Silver Sponsor">Silver Sponsor</option>
-              <option value="Beverage Partner">Beverage Partner</option>
-              <option value="Media Partner">Media Partner</option>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Date & Time *</label>
+            <input type="datetime-local" id="meeting-datetime" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Meeting Format</label>
+            <select id="meeting-format" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+              <option value="Zoom / Google Meet">Zoom / Google Meet</option>
+              <option value="In-Person Office Meeting">In-Person Office Meeting</option>
+              <option value="Phone Call">Phone Call</option>
             </select>
           </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Target Tier Pitch</label>
+            <select id="meeting-tier" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"></select>
+          </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Deal Value (Rs.)</label>
-            <input type="number" id="lead-value" required min="0" placeholder="100000" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Assigned Lead</label>
+            <select id="meeting-owner" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"></select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Agenda Notes</label>
+          <textarea id="meeting-agenda" rows="2" placeholder="Present 10-slide deck, offer logo placement on main banner & opening speech slot." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-emerald-500 resize-none"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+          <button type="button" onclick="closeModal('add-meeting-modal')" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs rounded-lg font-semibold hover:bg-slate-700 transition">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-emerald-600 text-white text-xs rounded-lg font-bold hover:bg-emerald-500 transition">Schedule Meeting</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Lead Form -->
+  <div id="add-lead-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-card max-w-lg w-full rounded-xl border border-slate-800 shadow-2xl p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2" id="modal-lead-title">
+          <i class="fa-solid fa-building-circle-check text-indigo-400"></i> Add New Sponsor Prospect
+        </h3>
+        <button onclick="closeModal('add-lead-modal')" class="text-slate-400 hover:text-white transition">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
+      </div>
+
+      <form id="lead-form" onsubmit="handleSaveLead(event)" class="space-y-3">
+        <input type="hidden" id="lead-id">
+        
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Company / Brand Name *</label>
+          <input type="text" id="lead-company" required placeholder="e.g., Jazz, Systems Ltd, Nestle" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Target Sponsorship Tier</label>
+            <select id="lead-tier" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"></select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Deal Value (Rs.) *</label>
+            <input type="number" id="lead-value" required min="0" step="5000" placeholder="100000" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Stage Status</label>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Pipeline Stage</label>
             <select id="lead-status" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
               <option value="Prospect">Prospect</option>
               <option value="Contacted">Contacted</option>
               <option value="Pitch Sent">Pitch Sent</option>
               <option value="Meeting Scheduled">Meeting Scheduled</option>
-              <option value="Closed-Won">Closed-Won</option>
+              <option value="Closed-Won">Closed-Won 🏆</option>
               <option value="Closed-Lost">Closed-Lost</option>
             </select>
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Owner / Lead Member</label>
-            <input type="text" id="lead-owner" placeholder="e.g. Ali Khan" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Assigned Member</label>
+            <select id="lead-owner" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"></select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Contact Email / Phone</label>
+            <input type="text" id="lead-email" placeholder="contact@company.pk" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Follow-Up Date</label>
+            <input type="date" id="lead-followup" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Contact Email</label>
-          <input type="email" id="lead-email" placeholder="sponsor@brand.com" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Notes</label>
+          <textarea id="lead-notes" rows="2" placeholder="Sent sponsorship deck to marketing head." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-indigo-500 resize-none"></textarea>
         </div>
 
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Next Follow-Up Date</label>
-          <input type="date" id="lead-followup" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
-        </div>
-
-        <div class="flex justify-end gap-2 pt-2">
-          <button type="button" onclick="closeModal('add-lead-modal')" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs font-semibold rounded-lg">Cancel</button>
-          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg">Save Lead</button>
+        <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+          <button type="button" onclick="closeModal('add-lead-modal')" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs rounded-lg font-semibold hover:bg-slate-700 transition">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 text-white text-xs rounded-lg font-bold hover:bg-indigo-500 transition">Save Prospect</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Add Meeting Modal -->
-  <div id="add-meeting-modal" class="modal-backdrop fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="glass-card modal-box w-full max-w-md p-6 rounded-2xl border border-slate-800 space-y-4">
+  <!-- MODAL: Import CSV -->
+  <div id="import-csv-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-card max-w-md w-full rounded-xl border border-slate-800 shadow-2xl p-6 space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="font-bold text-white text-sm">Schedule Pitch Meeting</h3>
-        <button onclick="closeModal('add-meeting-modal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-file-import text-emerald-400"></i> Import CSV Data
+        </h3>
+        <button onclick="closeModal('import-csv-modal')" class="text-slate-400 hover:text-white transition">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
       </div>
 
-      <form onsubmit="handleAddMeeting(event)" class="space-y-3">
+      <p class="text-xs text-slate-400">Paste CSV formatted text from Google Sheets to import leads.</p>
+
+      <textarea id="csv-paste-area" rows="6" placeholder="Company,Tier,Value,Status,Email,FollowUp,Owner,Notes&#10;Jazz,Title,200000,Contacted,info@jazz.com.pk,2026-10-10,Ali,Deck sent" class="w-full bg-slate-950 font-mono border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 resize-none"></textarea>
+
+      <div class="flex justify-end gap-2 border-t border-slate-800 pt-3">
+        <button onclick="closeModal('import-csv-modal')" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs rounded-lg font-semibold hover:bg-slate-700 transition">Cancel</button>
+        <button onclick="handleCSVImport()" class="px-4 py-2 bg-emerald-600 text-white text-xs rounded-lg font-bold hover:bg-emerald-500 transition">Import Leads</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Email Generator -->
+  <div id="email-gen-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-card max-w-lg w-full rounded-xl border border-slate-800 shadow-2xl p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-regular fa-paper-plane text-emerald-400"></i> Pitch Meeting Invite Template
+        </h3>
+        <button onclick="closeModal('email-gen-modal')" class="text-slate-400 hover:text-white transition">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-slate-300 leading-relaxed space-y-2 select-all relative" id="email-template-text">
+          <p class="text-indigo-400 font-bold">Subject: Strategic Sponsorship Opportunity: [Society/Event Name] x [Sponsor Brand]</p>
+          <p>Respected [Contact Name / Team],</p>
+          <p>I hope this email finds you well.</p>
+          <p>I am reaching out on behalf of [Your Society Name]. We are hosting [Event Name], expected to bring together over [Target Audience, e.g. 800+] university students and young professionals across Pakistan.</p>
+          <p>Given [Sponsor Brand]'s industry leadership, we would love to feature you as an official partner. We offer direct stall activations, banner placements, and digital coverage.</p>
+          <p>Would you be open to a quick 10-minute pitch meeting or call this week to discuss details?</p>
+          <p>Best regards,<br>[Your Name]<br>Sponsorship Lead, [Your Society Name]</p>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 border-t border-slate-800 pt-3">
+        <button onclick="closeModal('email-gen-modal')" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs rounded-lg font-semibold hover:bg-slate-700 transition">Close</button>
+        <button onclick="copyMeetingEmailTemplate()" class="px-4 py-2 bg-indigo-600 text-white text-xs rounded-lg font-bold hover:bg-indigo-500 transition shadow-lg shadow-indigo-600/30 flex items-center gap-1.5">
+          <i class="fa-regular fa-copy"></i> Copy Email
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Settings -->
+  <div id="settings-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-card max-w-md w-full rounded-xl border border-slate-800 shadow-2xl p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-sliders text-indigo-400"></i> Drive & Database Settings
+        </h3>
+        <button onclick="closeModal('settings-modal')" class="text-slate-400 hover:text-white transition">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3">
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Sponsor / Company Name</label>
-          <input type="text" id="meeting-company" required placeholder="e.g. PepsiCo Pakistan" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Target Financial Goal (Rs.)</label>
+          <input type="number" id="settings-target" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Meeting Date & Time</label>
-          <input type="datetime-local" id="meeting-time" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Currency Symbol</label>
+          <input type="text" id="settings-currency" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Location / Online Link</label>
-          <input type="text" id="meeting-location" placeholder="Google Meet or Head Office Gulberg" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Days Remaining</label>
+          <input type="number" id="settings-days" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
         </div>
+        
+        <div id="list-managers" class="space-y-4 pt-3 border-t border-slate-800"></div>
+      </div>
 
+      <div class="flex justify-end gap-2 border-t border-slate-800 pt-3">
+        <button onclick="closeModal('settings-modal')" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs rounded-lg font-semibold hover:bg-slate-700 transition">Cancel</button>
+        <button onclick="saveSettings()" class="px-4 py-2 bg-indigo-600 text-white text-xs rounded-lg font-bold hover:bg-indigo-500 transition">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Complete Note -->
+  <div id="complete-note-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-card max-w-md w-full rounded-xl border border-slate-800 shadow-2xl p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400"></i> Mark as Completed</h3>
+        <button type="button" onclick="closeModal('complete-note-modal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-base"></i></button>
+      </div>
+      <p id="complete-note-text" class="text-xs text-slate-300 bg-slate-950 border border-slate-800 rounded-lg p-3 break-words"></p>
+      <form onsubmit="submitComplete(event)" class="space-y-3">
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Key Pitch Talking Points</label>
-          <textarea id="meeting-notes" rows="3" placeholder="Emphasize 2000+ student turnout & stall placement" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"></textarea>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Your Name *</label>
+          <input id="complete-name" list="team-datalist" required maxlength="40" autocomplete="off" placeholder="Type or pick your name" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+          <datalist id="team-datalist"></datalist>
         </div>
-
-        <div class="flex justify-end gap-2 pt-2">
-          <button type="button" onclick="closeModal('add-meeting-modal')" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs font-semibold rounded-lg">Cancel</button>
-          <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg">Schedule Meeting</button>
+        <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+          <button type="button" onclick="closeModal('complete-note-modal')" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs rounded-lg font-semibold hover:bg-slate-700 transition">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-emerald-600 text-white text-xs rounded-lg font-bold hover:bg-emerald-500 transition">Mark Completed</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Email Generator Modal -->
-  <div id="email-generator-modal" class="modal-backdrop fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="glass-card modal-box w-full max-w-lg p-6 rounded-2xl border border-slate-800 space-y-4">
+  <!-- MODAL: Quick Add -->
+  <div id="quick-add-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-card max-w-sm w-full rounded-xl border border-slate-800 shadow-2xl p-6 space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="font-bold text-white text-sm flex items-center gap-2"><i class="fa-regular fa-envelope text-indigo-400"></i> Pitch Email Generator</h3>
-        <button onclick="closeModal('email-generator-modal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        <h3 id="quick-title" class="text-base font-bold text-white">Add</h3>
+        <button type="button" onclick="closeModal('quick-add-modal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-base"></i></button>
       </div>
-
-      <div class="space-y-3">
-        <textarea id="email-gen-output" rows="10" readonly class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs text-slate-200 font-mono"></textarea>
-        <div class="flex justify-between items-center">
-          <span class="text-[11px] text-slate-400">Ready to copy and paste to HR / Brand Manager</span>
-          <button onclick="copyMeetingEmail()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition flex items-center gap-1.5">
-            <i class="fa-solid fa-copy"></i> Copy to Clipboard
-          </button>
+      <form onsubmit="submitQuick(event)" class="space-y-3">
+        <input id="quick-name" required maxlength="50" autocomplete="off" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+        <div id="quick-value-wrap" class="hidden">
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Typical Deal Value (Rs.)</label>
+          <input id="quick-value" type="number" min="0" step="5000" placeholder="150000" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
         </div>
-      </div>
+        <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
+          <button type="button" onclick="closeModal('quick-add-modal')" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs rounded-lg font-semibold hover:bg-slate-700 transition">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 text-white text-xs rounded-lg font-bold hover:bg-indigo-500 transition">Add</button>
+        </div>
+      </form>
     </div>
   </div>
 
-  <!-- CSV Import Modal -->
-  <div id="import-csv-modal" class="modal-backdrop fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="glass-card modal-box w-full max-w-md p-6 rounded-2xl border border-slate-800 space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="font-bold text-white text-sm">Import CSV Data</h3>
-        <button onclick="closeModal('import-csv-modal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-      </div>
+  <!-- Notification Toast Container -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
 
-      <div class="space-y-3">
-        <p class="text-xs text-slate-400">Upload a CSV file with columns: <code>Company, Tier, Value, Status, Email, Owner</code></p>
-        <input type="file" id="csv-file-input" accept=".csv" class="w-full text-xs text-slate-300 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-indigo-300 hover:file:bg-slate-700">
-        <div class="flex justify-end gap-2 pt-2">
-          <button onclick="closeModal('import-csv-modal')" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs font-semibold rounded-lg">Cancel</button>
-          <button onclick="importCSVData()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg">Import CSV</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- JavaScript Application Logic -->
+  <!-- APPLICATION CORE SCRIPT -->
   <script>
-    // HARDCODED FIREBASE CONFIGURATION
-    const HARDCODED_FIREBASE_CONFIG = {
-      apiKey: "AIzaSyYOUR_API_KEY_HERE",
-      authDomain: "your-app.firebaseapp.com",
-      databaseURL: "https://your-app-default-rtdb.firebaseio.com",
-      projectId: "your-app",
-      storageBucket: "your-app.appspot.com",
-      messagingSenderId: "1234567890",
-      appId: "1:1234567890:web:abcdef123456"
+    // Hardcoded Firebase Config
+    const firebaseConfig = {
+      "apiKey": "AIzaSyBdS6DU6a1qAjtwsCONrSXEKZ1IWzJ3RQc",
+      "authDomain": "sponsorship-tracker-4d736.firebaseapp.com",
+      "databaseURL": "https://sponsorship-tracker-4d736-default-rtdb.firebaseio.com",
+      "projectId": "sponsorship-tracker-4d736",
+      "storageBucket": "sponsorship-tracker-4d736.firebasestorage.app",
+      "messagingSenderId": "98189953022",
+      "appId": "1:98189953022:web:9dd323b7e49730c97822af"
     };
 
     // Global State Container
-    let appState = {
-      targetGoal: 500000,
+    window.appState = {
+      activeTab: 'kickstart',
       currencySymbol: 'Rs. ',
+      targetGoal: 500000,
       daysRemaining: 30,
-      viewMode: 'table', // 'table' or 'kanban'
-      googleSheetUrl: '',
-      requirements: [],
-      notes: [],
-      meetings: [],
+      viewMode: 'table',
       leads: [],
-      weeklyPlan: []
+      requirements: [],
+      meetings: [],
+      weeklyPlan: [],
+      notes: [],
+      team: [],
+      tiers: [],
+      categories: [],
+      lastName: '',
+      firebaseConfig: firebaseConfig
     };
 
-    let firebaseDb = null;
+    const defaultRequirements = [
+      { id: 'req_1', name: 'Auditorium Hall & Stage Rental', category: 'Venue & Stage', type: 'Cash', cost: 120000, status: 'Needed' },
+      { id: 'req_2', name: 'Event Refreshments & Hi-Tea (500 pax)', category: 'Food & Catering', type: 'In-Kind', cost: 150000, status: 'In Discussion' },
+      { id: 'req_3', name: 'Sound System & Lights Setup', category: 'Sound & AV Tech', type: 'Cash', cost: 80000, status: 'Needed' },
+      { id: 'req_4', name: 'Printed Standees, Banners & Badges', category: 'Printing & Marketing', type: 'Cash', cost: 50000, status: 'Needed' },
+      { id: 'req_5', name: 'Winner Cash Prizes & Shields', category: 'Prizes & Shields', type: 'Cash', cost: 100000, status: 'Secured' }
+    ];
 
-    // Initialize App & Firebase
-    window.addEventListener('DOMContentLoaded', () => {
-      initFirebase();
-      loadData();
+    const defaultMeetings = [
+      { id: 'm_1', company: 'Jazz', datetime: '2026-10-06T14:30', format: 'Zoom / Google Meet', tier: 'Title Sponsor', owner: 'Ali (Lead)', agenda: 'Pitch title sponsorship deck and booth rights.' },
+      { id: 'm_2', company: 'Systems Ltd', datetime: '2026-10-08T11:00', format: 'In-Person Office Meeting', tier: 'Gold Sponsor', owner: 'Sara (Finance)', agenda: 'Discuss recruitment stall and tech workshop slot.' }
+    ];
+
+    const defaultLeads = [
+      { id: '1', company: 'Jazz', tier: 'Title Sponsor', value: 200000, status: 'Meeting Scheduled', email: 'sponsorships@jazz.com.pk', followup: '2026-10-06', owner: 'Ali (Lead)', notes: 'Meeting confirmed to present proposal deck.' },
+      { id: '2', company: 'Systems Ltd', tier: 'Gold Sponsor', value: 100000, status: 'Meeting Scheduled', email: 'careers@systemsltd.com', followup: '2026-10-08', owner: 'Sara (Finance)', notes: 'In-person pitch meeting set.' },
+      { id: '3', company: 'Nestle Pakistan', tier: 'In-Kind Partner', value: 50000, status: 'Pitch Sent', email: 'brand@nestle.pk', followup: '2026-10-09', owner: 'You', notes: 'Sent customized beverage sponsorship offer.' }
+    ];
+
+    const defaultWeeklyPlan = [
+      {
+        weekNum: 1,
+        title: "Week 1: Budget, Pitch Deck & Lead List",
+        tasks: [
+          { id: 'w1t1', text: "Calculate event budget in PKR and list items", completed: true },
+          { id: 'w1t2', text: "Finalize Pitch Deck and Sponsor Tier Packages", completed: false },
+          { id: 'w1t3', text: "Compile target list of 15+ corporate brands in PK", completed: false }
+        ]
+      },
+      {
+        weekNum: 2,
+        title: "Week 2: Direct Outreach & Pitch Invites",
+        tasks: [
+          { id: 'w2t1', text: "Send cold pitch emails & LinkedIn requests", completed: false },
+          { id: 'w2t2', text: "Schedule 5+ pitch meetings with decision-makers", completed: false }
+        ]
+      },
+      {
+        weekNum: 3,
+        title: "Week 3: Meetings & Contract Negotiation",
+        tasks: [
+          { id: 'w3t1', text: "Conduct pitch meetings & customize perk packages", completed: false },
+          { id: 'w3t2', text: "Draft formal agreement contracts", completed: false }
+        ]
+      },
+      {
+        weekNum: 4,
+        title: "Week 4: Signings & Bank Transfers",
+        tasks: [
+          { id: 'w4t1', text: "Collect signed sponsorship contracts", completed: false },
+          { id: 'w4t2', text: "Verify bank wire transfers & product deliveries", completed: false }
+        ]
+      }
+    ];
+
+    /* ===== Helpers ===== */
+    const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const clone = o => JSON.parse(JSON.stringify(o));
+    const S = () => window.appState;
+    const defaultTeam = ['You', 'Ali (Lead)', 'Sara (Finance)'];
+    const defaultTiers = [
+      { name: 'Title Sponsor', value: 200000 },
+      { name: 'Gold Sponsor', value: 100000 },
+      { name: 'Silver Sponsor', value: 50000 },
+      { name: 'Bronze Sponsor', value: 25000 },
+      { name: 'In-Kind Partner', value: 50000 }
+    ];
+    const defaultCats = ['Venue & Stage', 'Food & Catering', 'Sound & AV Tech', 'Printing & Marketing', 'Prizes & Shields', 'Miscellaneous'];
+    const defaultNotes = [{ id: 'n_1', text: 'Confirm auditorium booking letter with the department head', kind: 'Requirement', priority: 'High', created: Date.now(), done: false }];
+    const tierValue = n => { const t = S().tiers.find(x => x.name === n); return t ? t.value : 50000; };
+
+    // Initialization
+    window.onload = function() {
+      loadLocalStorage();
       renderAll();
-    });
+    };
 
-    function initFirebase() {
-      try {
-        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-          firebase.initializeApp(HARDCODED_FIREBASE_CONFIG);
-          firebaseDb = firebase.database();
-          document.getElementById('sync-status').innerHTML = `
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <i class="fa-solid fa-cloud text-xs"></i> Firebase Active
-            </span>
-          `;
-
-          // Live listener
-          firebaseDb.ref('sponsorpulse_state').on('value', (snapshot) => {
-            const val = snapshot.val();
-            if (val) {
-              appState = { ...appState, ...val };
-              renderAll();
-            }
-          });
-        }
-      } catch (err) {
-        console.warn('Firebase init fallback to LocalStorage:', err);
-        document.getElementById('sync-status').innerHTML = `
-          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
-            <i class="fa-solid fa-database text-xs"></i> Local Storage Active
-          </span>
-        `;
-      }
+    function resetToDefaults() {
+      window.appState.requirements = clone(defaultRequirements);
+      window.appState.meetings = clone(defaultMeetings);
+      window.appState.leads = clone(defaultLeads);
+      window.appState.weeklyPlan = clone(defaultWeeklyPlan);
+      window.appState.notes = clone(defaultNotes);
+      window.appState.team = [...defaultTeam];
+      window.appState.tiers = clone(defaultTiers);
+      window.appState.categories = [...defaultCats];
+      window.appState.firebaseConfig = firebaseConfig;
+      saveToLocalStorage();
     }
 
-    // Default PKR Template
-    function applyDefaultRequirementsTemplate() {
-      appState.requirements = [
-        { id: '1', title: 'Main Auditorium & AV Setup', category: 'Venue & AV', type: 'Cash', cost: 120000, covered: false },
-        { id: '2', title: 'Hi-Tea & Drinks for 50 Guests', category: 'Refreshments / Food', type: 'In-Kind', cost: 80000, covered: false },
-        { id: '3', title: 'Standees, Banners & Backdrop Printing', category: 'Marketing & Printing', type: 'Cash', cost: 45000, covered: false },
-        { id: '4', title: 'Guest Speakers Honorarium & Shields', category: 'Shields & Merchandise', type: 'Cash', cost: 55000, covered: false },
-        { id: '5', title: 'Event Certificates & Volunteer Badges', category: 'Marketing & Printing', type: 'Cash', cost: 25000, covered: false }
-      ];
-      saveData();
-      renderAll();
-      confetti({ particleCount: 50, spread: 60, origin: { y: 0.8 } });
-    }
-
-    function resetWeeklyPlanToDefault() {
-      appState.weeklyPlan = [
-        {
-          week: 'Week 1',
-          title: 'Prospecting & Tier Packaging',
-          tasks: [
-            { text: 'Finalize Event Expense Requirements in Rs.', done: true },
-            { text: 'Draft Sponsorship Proposal Deck with Gemini', done: false },
-            { text: 'Build target list of 20 local companies & brands', done: false }
-          ]
-        },
-        {
-          week: 'Week 2',
-          title: 'Outreach & Meeting Blitz',
-          tasks: [
-            { text: 'Send cold pitch emails to marketing heads', done: false },
-            { text: 'Follow up on pitch emails after 48 hours', done: false },
-            { text: 'Schedule minimum 5 pitch calls/meetings', done: false }
-          ]
-        },
-        {
-          week: 'Week 3',
-          title: 'Closing & MoU Signings',
-          tasks: [
-            { text: 'Conduct pitch meetings with decision makers', done: false },
-            { text: 'Send customized MoU contracts to sponsors', done: false },
-            { text: 'Collect 50% advance payments/brand vouchers', done: false }
-          ]
-        },
-        {
-          week: 'Week 4',
-          title: 'Execution & Deliverables',
-          tasks: [
-            { text: 'Collect sponsor logos for standees & banners', done: false },
-            { text: 'Setup sponsor stalls at venue', done: false },
-            { text: 'Send post-event thank you & impression reports', done: false }
-          ]
-        }
-      ];
-      saveData();
-      renderAll();
-    }
-
-    // Save & Load
-    function saveData() {
-      localStorage.setItem('sponsorpulse_state', JSON.stringify(appState));
-      if (firebaseDb) {
-        firebaseDb.ref('sponsorpulse_state').set(appState);
-      }
-    }
-
-    function loadData() {
-      const local = localStorage.getItem('sponsorpulse_state');
-      if (local) {
-        try {
-          appState = { ...appState, ...JSON.parse(local) };
-        } catch(e){}
-      }
-      if (!appState.weeklyPlan || appState.weeklyPlan.length === 0) {
-        resetWeeklyPlanToDefault();
-      }
-    }
-
-    // Render Master
-    function renderAll() {
-      // Header & Stats
-      document.getElementById('header-countdown').innerText = `${appState.daysRemaining || 30} Days Left`;
-      document.getElementById('stat-target-value').innerText = `${appState.currencySymbol}${appState.targetGoal.toLocaleString()}`;
-      document.getElementById('stat-req-count').innerText = `From ${appState.requirements.length} requirement items`;
-
-      // Confirmed Secured Calculation
-      const wonLeads = appState.leads.filter(l => l.status === 'Closed-Won');
-      const raisedTotal = wonLeads.reduce((sum, l) => sum + (parseFloat(l.value) || 0), 0);
-      const percentSecured = appState.targetGoal > 0 ? Math.min(100, Math.round((raisedTotal / appState.targetGoal) * 100)) : 0;
-
-      document.getElementById('stat-raised-value').innerText = `${appState.currencySymbol}${raisedTotal.toLocaleString()}`;
-      document.getElementById('stat-raised-percent').innerText = `(${percentSecured}%)`;
-      document.getElementById('stat-progress-bar').style.width = `${percentSecured}%`;
-
-      // Meetings Stat
-      document.getElementById('stat-meetings-count').innerText = appState.meetings.length;
-      document.getElementById('stat-upcoming-meetings').innerText = appState.meetings.length;
-
-      // Pipeline Stat
-      const activeLeads = appState.leads.filter(l => l.status !== 'Closed-Lost');
-      const pipelineTotal = activeLeads.reduce((sum, l) => sum + (parseFloat(l.value) || 0), 0);
-      document.getElementById('stat-pipeline-value').innerText = `${appState.currencySymbol}${pipelineTotal.toLocaleString()}`;
-      document.getElementById('stat-active-leads-count').innerText = activeLeads.length;
-
-      // Render individual views
-      renderRequirementsView();
-      renderNotesView();
-      renderMeetingsView();
+    // UI Rendering Functions
+    window.renderAll = function() {
+      renderStats();
+      renderRequirementsTable();
+      renderMeetingsList();
       renderLeadsTable();
       renderWeeklyPlan();
+      fillSelects();
+      renderNotes();
+    };
+
+    function renderStats() {
+      const sym = window.appState.currencySymbol || 'Rs. ';
+      const reqs = window.appState.requirements || [];
+      const totalReqBudget = reqs.reduce((sum, r) => sum + Number(r.cost || 0), 0);
       
-      if (appState.googleSheetUrl) {
-        document.getElementById('google-sheet-url').value = appState.googleSheetUrl;
-      }
+      const goal = totalReqBudget > 0 ? totalReqBudget : window.appState.targetGoal;
+
+      const leads = window.appState.leads || [];
+      const confirmedValue = leads.filter(l => l.status === 'Closed-Won').reduce((acc, l) => acc + Number(l.value || 0), 0);
+      const pipelineValue = leads.filter(l => l.status !== 'Closed-Lost').reduce((acc, l) => acc + Number(l.value || 0), 0);
+      const activeCount = leads.filter(l => l.status !== 'Closed-Won' && l.status !== 'Closed-Lost').length;
+      const percentage = goal > 0 ? Math.min(100, Math.round((confirmedValue / goal) * 100)) : 0;
+
+      const meetings = window.appState.meetings || [];
+
+      document.getElementById('stat-target-value').innerText = `${sym}${goal.toLocaleString()}`;
+      document.getElementById('stat-req-count').innerText = `From ${reqs.length} requirement items`;
+      document.getElementById('stat-raised-value').innerText = `${sym}${confirmedValue.toLocaleString()}`;
+      document.getElementById('stat-raised-percent').innerText = `(${percentage}%)`;
+      document.getElementById('stat-progress-bar').style.width = `${percentage}%`;
+      document.getElementById('stat-pipeline-value').innerText = `${sym}${pipelineValue.toLocaleString()}`;
+      document.getElementById('stat-active-leads-count').innerText = activeCount;
+      
+      document.getElementById('stat-meetings-count').innerText = meetings.length;
+      document.getElementById('stat-upcoming-meetings').innerText = meetings.filter(m => new Date(m.datetime) >= new Date()).length;
+
+      document.getElementById('header-countdown').innerText = `${window.appState.daysRemaining || 30} Days Left`;
     }
 
-    // View Switching
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-600/20');
-        btn.classList.add('text-slate-400', 'hover:text-slate-200');
-      });
-
-      const activeBtn = document.getElementById(`tab-${tabId}`);
-      if (activeBtn) {
-        activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-600/20');
-        activeBtn.classList.remove('text-slate-400');
-      }
-
-      document.querySelectorAll('.tab-content').forEach(view => view.classList.add('hidden'));
-      const targetView = document.getElementById(`view-${tabId}`);
-      if (targetView) targetView.classList.remove('hidden');
-    }
-
-    // Modals
-    function openModal(id) {
-      document.getElementById(id)?.classList.remove('hidden');
-    }
-    function closeModal(id) {
-      document.getElementById(id)?.classList.add('hidden');
-    }
-
-    // Settings Modal Functions (NO FIREBASE CONFIG INPUT)
-    function openSettings() {
-      document.getElementById('settings-target').value = appState.targetGoal || 500000;
-      document.getElementById('settings-currency').value = appState.currencySymbol || 'Rs. ';
-      document.getElementById('settings-days').value = appState.daysRemaining || 30;
-      openModal('settings-modal');
-    }
-
-    function saveSettings(e) {
-      if (e) e.preventDefault();
-      appState.targetGoal = parseFloat(document.getElementById('settings-target').value) || 500000;
-      appState.currencySymbol = document.getElementById('settings-currency').value || 'Rs. ';
-      appState.daysRemaining = parseInt(document.getElementById('settings-days').value) || 30;
-
-      saveData();
-      closeModal('settings-modal');
-      renderAll();
-    }
-
-    // Requirements Logic
-    function handleAddRequirement(e) {
-      e.preventDefault();
-      const newItem = {
-        id: Date.now().toString(),
-        title: document.getElementById('req-title').value,
-        category: document.getElementById('req-category').value,
-        type: document.getElementById('req-type').value,
-        cost: parseFloat(document.getElementById('req-cost').value) || 0,
-        covered: false
-      };
-      appState.requirements.push(newItem);
-      saveData();
-      closeModal('add-requirement-modal');
-      document.getElementById('req-title').value = '';
-      document.getElementById('req-cost').value = '';
-      renderAll();
-    }
-
-    function toggleRequirementCovered(id) {
-      const req = appState.requirements.find(r => r.id === id);
-      if (req) {
-        req.covered = !req.covered;
-        saveData();
-        renderAll();
-      }
-    }
-
-    function deleteRequirement(id) {
-      appState.requirements = appState.requirements.filter(r => r.id !== id);
-      saveData();
-      renderAll();
-    }
-
-    function renderRequirementsView() {
+    function renderRequirementsTable() {
+      const reqs = window.appState.requirements || [];
       const tbody = document.getElementById('requirements-table-body');
+      const sym = window.appState.currencySymbol || 'Rs. ';
+
+      let cashTotal = 0, inkindTotal = 0, gapTotal = 0;
       tbody.innerHTML = '';
 
-      let cashSum = 0;
-      let inkindSum = 0;
-      let gapSum = 0;
-
-      appState.requirements.forEach(item => {
-        if (item.type === 'Cash') cashSum += item.cost;
-        else inkindSum += item.cost;
-
-        if (!item.covered) gapSum += item.cost;
-
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-800/40 transition';
-        tr.innerHTML = `
-          <td class="px-4 py-3 font-medium text-white">${item.title}</td>
-          <td class="px-4 py-3 text-slate-400">${item.category}</td>
-          <td class="px-4 py-3">
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${item.type === 'Cash' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-amber-500/20 text-amber-300'}">
-              ${item.type}
-            </span>
-          </td>
-          <td class="px-4 py-3 font-semibold text-slate-200">${appState.currencySymbol}${item.cost.toLocaleString()}</td>
-          <td class="px-4 py-3">
-            <button onclick="toggleRequirementCovered('${item.id}')" class="px-2.5 py-1 rounded-full text-[11px] font-extrabold flex items-center gap-1 ${item.covered ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-400 border border-slate-700'}">
-              <i class="fa-solid ${item.covered ? 'fa-check' : 'fa-xmark'}"></i> ${item.covered ? 'Covered' : 'Unfunded'}
-            </button>
-          </td>
-          <td class="px-4 py-3 text-right">
-            <button onclick="deleteRequirement('${item.id}')" class="text-slate-500 hover:text-rose-400 transition"><i class="fa-solid fa-trash"></i></button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      document.getElementById('req-cash-total').innerText = `${appState.currencySymbol}${cashSum.toLocaleString()}`;
-      document.getElementById('req-inkind-total').innerText = `${appState.currencySymbol}${inkindSum.toLocaleString()}`;
-      document.getElementById('req-gap-total').innerText = `${appState.currencySymbol}${gapSum.toLocaleString()}`;
-    }
-
-    // Notes Logic
-    function handleAddNote(e) {
-      e.preventDefault();
-      const text = document.getElementById('note-text').value.trim();
-      if (!text) return;
-
-      const note = {
-        id: Date.now().toString(),
-        text,
-        kind: document.getElementById('note-kind').value,
-        priority: document.getElementById('note-priority').value,
-        done: false,
-        completedBy: ''
-      };
-      appState.notes.unshift(note);
-      saveData();
-      document.getElementById('note-text').value = '';
-      renderAll();
-    }
-
-    function toggleNoteDone(id) {
-      const note = appState.notes.find(n => n.id === id);
-      if (note) {
-        note.done = !note.done;
-        if (note.done) {
-          const userName = prompt('Enter your name to mark this task complete:', 'Team Member') || 'Team Member';
-          note.completedBy = userName;
-        } else {
-          note.completedBy = '';
-        }
-        saveData();
-        renderAll();
-      }
-    }
-
-    function deleteNote(id) {
-      appState.notes = appState.notes.filter(n => n.id !== id);
-      saveData();
-      renderAll();
-    }
-
-    function clearCompletedNotes() {
-      appState.notes = appState.notes.filter(n => !n.done);
-      saveData();
-      renderAll();
-    }
-
-    function renderNotesView() {
-      const pendingList = document.getElementById('notes-pending-list');
-      const doneList = document.getElementById('notes-done-list');
-      pendingList.innerHTML = '';
-      doneList.innerHTML = '';
-
-      const pending = appState.notes.filter(n => !n.done);
-      const done = appState.notes.filter(n => n.done);
-
-      document.getElementById('notes-pending-count').innerText = pending.length;
-      document.getElementById('notes-done-count').innerText = done.length;
-
-      const badge = document.getElementById('notes-badge');
-      if (pending.length > 0) {
-        badge.innerText = pending.length;
-        badge.classList.remove('hidden');
-        badge.classList.add('inline-flex');
+      if (reqs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-500 text-xs">No event requirements added yet.</td></tr>`;
       } else {
-        badge.classList.add('hidden');
+        reqs.forEach((r, idx) => {
+          const val = Number(r.cost || 0);
+          if (r.type === 'Cash') cashTotal += val; else inkindTotal += val;
+          if (r.status !== 'Secured') gapTotal += val;
+
+          let statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">Needed</span>`;
+          if (r.status === 'In Discussion') statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">In Discussion</span>`;
+          if (r.status === 'Secured') statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Secured 🏆</span>`;
+
+          const tr = document.createElement('tr');
+          tr.className = "hover:bg-slate-900/60 transition border-b border-slate-800/40";
+          tr.innerHTML = `
+            <td class="px-4 py-3 font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-box text-cyan-400"></i> ${esc(r.name)}
+            </td>
+            <td class="px-4 py-3 text-slate-400"><span class="px-2 py-0.5 bg-slate-800 rounded border border-slate-700/60">${esc(r.category)}</span></td>
+            <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[11px] font-semibold ${r.type === 'Cash' ? 'bg-indigo-500/10 text-indigo-300' : 'bg-amber-500/10 text-amber-300'}">${esc(r.type)}</span></td>
+            <td class="px-4 py-3 font-bold text-emerald-400">${sym}${val.toLocaleString()}</td>
+            <td class="px-4 py-3"><button onclick="cycleReqStatus(${idx})" title="Click to change status" class="hover:opacity-80">${statusBadge}</button></td>
+            <td class="px-4 py-3 text-right">
+              <button onclick="deleteRequirement(${idx})" class="p-1.5 text-slate-400 hover:text-rose-400 transition" title="Delete">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
       }
 
-      pending.forEach(note => {
-        const div = document.createElement('div');
-        div.className = 'glass-card p-3 rounded-lg border border-slate-800 flex items-center justify-between gap-3';
-        div.innerHTML = `
-          <div class="flex items-center gap-3 flex-1">
-            <button onclick="toggleNoteDone('${note.id}')" class="w-5 h-5 rounded border border-slate-700 hover:border-cyan-400 flex items-center justify-center text-transparent hover:text-cyan-400 transition"><i class="fa-solid fa-check text-xs"></i></button>
-            <span class="text-xs text-slate-200">${note.text}</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-semibold">${note.kind}</span>
-            <button onclick="deleteNote('${note.id}')" class="text-slate-500 hover:text-rose-400 transition text-xs"><i class="fa-solid fa-trash"></i></button>
-          </div>
-        `;
-        pendingList.appendChild(div);
-      });
-
-      done.forEach(note => {
-        const div = document.createElement('div');
-        div.className = 'glass-card p-3 rounded-lg border border-slate-800/50 opacity-70 flex items-center justify-between gap-3';
-        div.innerHTML = `
-          <div class="flex items-center gap-3 flex-1">
-            <button onclick="toggleNoteDone('${note.id}')" class="w-5 h-5 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center text-xs"><i class="fa-solid fa-check"></i></button>
-            <span class="text-xs text-slate-400 line-through">${note.text}</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-[10px] text-emerald-400 font-medium">By ${note.completedBy || 'Team'}</span>
-            <button onclick="deleteNote('${note.id}')" class="text-slate-600 hover:text-rose-400 transition text-xs"><i class="fa-solid fa-trash"></i></button>
-          </div>
-        `;
-        doneList.appendChild(div);
-      });
+      document.getElementById('req-cash-total').innerText = `${sym}${cashTotal.toLocaleString()}`;
+      document.getElementById('req-inkind-total').innerText = `${sym}${inkindTotal.toLocaleString()}`;
+      document.getElementById('req-gap-total').innerText = `${sym}${gapTotal.toLocaleString()}`;
     }
 
-    // Meeting Planner Logic
-    function handleAddMeeting(e) {
+    function handleSaveRequirement(e) {
       e.preventDefault();
-      const meeting = {
-        id: Date.now().toString(),
-        company: document.getElementById('meeting-company').value,
-        time: document.getElementById('meeting-time').value,
-        location: document.getElementById('meeting-location').value || 'Online Call',
-        notes: document.getElementById('meeting-notes').value
-      };
-      appState.meetings.push(meeting);
-      saveData();
-      closeModal('add-meeting-modal');
+      const name = document.getElementById('req-name').value.trim();
+      const category = document.getElementById('req-category').value;
+      const type = document.getElementById('req-type').value;
+      const cost = parseFloat(document.getElementById('req-cost').value) || 0;
+      const status = document.getElementById('req-status').value;
+
+      window.appState.requirements.push({ id: 'req_' + Date.now(), name, category, type, cost, status });
+      closeModal('add-requirement-modal');
+      saveToLocalStorage();
       renderAll();
+      showToast('Added event requirement', 'success');
     }
 
-    function deleteMeeting(id) {
-      appState.meetings = appState.meetings.filter(m => m.id !== id);
-      saveData();
+    function deleteRequirement(index) {
+      window.appState.requirements.splice(index, 1);
+      saveToLocalStorage();
       renderAll();
+      showToast('Requirement removed', 'info');
     }
 
-    function renderMeetingsView() {
+    function applyDefaultRequirementsTemplate() {
+      window.appState.requirements = clone(defaultRequirements);
+      saveToLocalStorage();
+      renderAll();
+      showToast('Loaded standard PKR budget template!', 'success');
+      switchTab('requirements');
+    }
+
+    function renderMeetingsList() {
       const container = document.getElementById('meetings-list-container');
+      const meetings = window.appState.meetings || [];
       container.innerHTML = '';
 
-      if (appState.meetings.length === 0) {
+      if (meetings.length === 0) {
         container.innerHTML = `
-          <div class="col-span-full glass-card p-8 rounded-xl border border-slate-800 text-center space-y-2">
+          <div class="col-span-full glass-card p-8 rounded-xl text-center space-y-3">
             <i class="fa-solid fa-calendar-xmark text-3xl text-slate-600"></i>
-            <p class="text-xs text-slate-400">No pitch meetings scheduled yet. Click "Schedule Pitch Meeting" above to get started.</p>
-          </div>
-        `;
-        return;
+            <h4 class="text-sm font-bold text-slate-300">No pitch meetings scheduled yet</h4>
+            <button onclick="openModal('add-meeting-modal')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg transition shadow-lg shadow-emerald-600/20">
+              Schedule First Pitch Meeting
+            </button>
+          </div>`;
+      } else {
+        meetings.forEach((m, idx) => {
+          const card = document.createElement('div');
+          card.className = "glass-card p-4 rounded-xl border border-slate-800 space-y-3 relative overflow-hidden flex flex-col justify-between";
+          
+          const dt = new Date(m.datetime);
+          const dateStr = isNaN(dt.getTime()) ? m.datetime : dt.toLocaleDateString('en-PK', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+          card.innerHTML = `
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 text-[10px] font-bold uppercase">${esc(m.format)}</span>
+                <span class="text-[11px] text-slate-400 font-medium">${esc(m.owner)}</span>
+              </div>
+
+              <h3 class="text-sm font-bold text-white flex items-center justify-between">
+                <span>${esc(m.company)}</span>
+                <span class="text-xs text-indigo-400 font-semibold">${esc(m.tier)}</span>
+              </h3>
+
+              <div class="text-xs text-amber-300 flex items-center gap-1.5 pt-1">
+                <i class="fa-regular fa-clock"></i>
+                <span class="font-semibold">${dateStr}</span>
+              </div>
+
+              ${m.agenda ? `<p class="text-[11px] text-slate-400 pt-1 border-t border-slate-800/80 leading-snug">${esc(m.agenda)}</p>` : ''}
+            </div>
+
+            <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between">
+              <button onclick="convertToClosedWon('${m.id}')" class="text-[11px] font-bold text-emerald-400 hover:text-emerald-300 transition flex items-center gap-1">
+                <i class="fa-solid fa-circle-check"></i> Move to Closed-Won
+              </button>
+              <button onclick="deleteMeeting(${idx})" class="text-slate-500 hover:text-rose-400 text-xs p-1">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      }
+    }
+
+    function handleSaveMeeting(e) {
+      e.preventDefault();
+      const company = document.getElementById('meeting-company').value.trim();
+      const datetime = document.getElementById('meeting-datetime').value;
+      const format = document.getElementById('meeting-format').value;
+      const tier = document.getElementById('meeting-tier').value;
+      const owner = document.getElementById('meeting-owner').value;
+      const agenda = document.getElementById('meeting-agenda').value.trim();
+
+      window.appState.meetings.push({ id: 'm_' + Date.now(), company, datetime, format, tier, owner, agenda });
+
+      const existingIdx = window.appState.leads.findIndex(l => l.company.toLowerCase() === company.toLowerCase());
+      if (existingIdx !== -1) {
+        if (window.appState.leads[existingIdx].status !== 'Closed-Won') window.appState.leads[existingIdx].status = 'Meeting Scheduled';
+      } else {
+        window.appState.leads.unshift({
+          id: 'lead_' + Date.now(),
+          company,
+          tier,
+          value: tierValue(tier),
+          status: 'Meeting Scheduled',
+          email: '',
+          followup: datetime.slice(0, 10),
+          owner,
+          notes: agenda || 'Pitch meeting scheduled.'
+        });
       }
 
-      appState.meetings.forEach(m => {
-        const formattedTime = new Date(m.time).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
-        const div = document.createElement('div');
-        div.className = 'glass-card p-5 rounded-xl border border-slate-800 space-y-3 relative group';
-        div.innerHTML = `
-          <div class="flex items-start justify-between">
-            <h3 class="font-bold text-white text-sm">${m.company}</h3>
-            <button onclick="deleteMeeting('${m.id}')" class="text-slate-600 hover:text-rose-400 text-xs transition"><i class="fa-solid fa-trash"></i></button>
+      closeModal('add-meeting-modal');
+      saveToLocalStorage();
+      renderAll();
+      showToast('Meeting scheduled & added to pipeline!', 'success');
+      triggerConfetti();
+    }
+
+    function deleteMeeting(idx) {
+      window.appState.meetings.splice(idx, 1);
+      saveToLocalStorage();
+      renderAll();
+      showToast('Meeting removed', 'info');
+    }
+
+    function renderLeadsTable() {
+      const search = (document.getElementById('lead-search').value || '').toLowerCase();
+      const statusFilter = document.getElementById('lead-status-filter').value;
+      const sym = window.appState.currencySymbol || 'Rs. ';
+
+      const filtered = (window.appState.leads || []).filter(l => {
+        const matchesSearch = l.company.toLowerCase().includes(search) || (l.owner && l.owner.toLowerCase().includes(search));
+        const matchesStatus = statusFilter === 'ALL' || l.status === statusFilter;
+        return matchesSearch && matchesStatus;
+      });
+
+      const tbody = document.getElementById('leads-table-body');
+      tbody.innerHTML = '';
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-500 text-xs">No sponsor prospects found.</td></tr>`;
+      } else {
+        filtered.forEach(lead => {
+          const tr = document.createElement('tr');
+          tr.className = "hover:bg-slate-900/60 transition group border-b border-slate-800/40";
+          tr.innerHTML = `
+            <td class="px-4 py-3 font-bold text-white flex items-center gap-2">
+              <div class="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-black text-indigo-400 shrink-0">
+                ${esc(lead.company.charAt(0).toUpperCase())}
+              </div>
+              <div>
+                <div>${esc(lead.company)}</div>
+                ${lead.notes ? `<p class="text-[10px] text-slate-400 font-normal truncate max-w-xs">${esc(lead.notes)}</p>` : ''}
+              </div>
+            </td>
+            <td class="px-4 py-3 text-slate-300"><span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-[11px]">${esc(lead.tier)}</span></td>
+            <td class="px-4 py-3 font-bold text-emerald-400">${sym}${Number(lead.value).toLocaleString()}</td>
+            <td class="px-4 py-3">${getStatusBadge(lead.status)}</td>
+            <td class="px-4 py-3 text-slate-400 font-mono text-[11px]">${esc(lead.email || '-')}</td>
+            <td class="px-4 py-3 text-slate-300 text-[11px]">${esc(lead.followup || 'Not set')}</td>
+            <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 text-[11px]">${esc(lead.owner || 'Unassigned')}</span></td>
+            <td class="px-4 py-3 text-right space-x-1">
+              <button onclick="editLead('${lead.id}')" class="p-1.5 text-slate-400 hover:text-indigo-400 transition"><i class="fa-solid fa-pen-to-square"></i></button>
+              <button onclick="deleteLead('${lead.id}')" class="p-1.5 text-slate-400 hover:text-rose-400 transition"><i class="fa-solid fa-trash-can"></i></button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      renderKanbanView(filtered);
+    }
+
+    function getStatusBadge(status) {
+      switch (status) {
+        case 'Closed-Won': return `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Closed-Won 🏆</span>`;
+        case 'Closed-Lost': return `<span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">Closed-Lost</span>`;
+        case 'Meeting Scheduled': return `<span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">Meeting Scheduled</span>`;
+        case 'Pitch Sent': return `<span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Pitch Sent</span>`;
+        case 'Contacted': return `<span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/20">Contacted</span>`;
+        default: return `<span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-slate-800 text-slate-400 border border-slate-700">Prospect</span>`;
+      }
+    }
+
+    function renderKanbanView(leads) {
+      const stages = ['Prospect', 'Contacted', 'Pitch Sent', 'Meeting Scheduled', 'Closed-Won', 'Closed-Lost'];
+      const container = document.getElementById('kanban-view-container');
+      container.innerHTML = '';
+      const sym = window.appState.currencySymbol || 'Rs. ';
+
+      stages.forEach(stage => {
+        const stageLeads = leads.filter(l => l.status === stage);
+        const stageValue = stageLeads.reduce((acc, l) => acc + Number(l.value || 0), 0);
+
+        const col = document.createElement('div');
+        col.className = "bg-slate-900/80 rounded-xl p-3 border border-slate-800 flex flex-col space-y-3 min-h-[380px]";
+        col.innerHTML = `
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <h4 class="text-xs font-bold text-slate-200 uppercase tracking-wider">${stage} (${stageLeads.length})</h4>
+            <span class="text-xs font-bold text-emerald-400">${sym}${stageValue.toLocaleString()}</span>
           </div>
-          <div class="space-y-1.5 text-xs text-slate-300">
-            <div class="flex items-center gap-2 text-emerald-400 font-medium">
-              <i class="fa-regular fa-clock"></i> ${formattedTime}
-            </div>
-            <div class="flex items-center gap-2 text-slate-400">
-              <i class="fa-solid fa-location-dot"></i> ${m.location}
-            </div>
+          <div class="space-y-2 flex-1 overflow-y-auto">
+            ${stageLeads.map(l => `
+              <div class="bg-slate-950 p-3 rounded-lg border border-slate-800/80 hover:border-indigo-500/50 transition cursor-pointer shadow-md space-y-2" onclick="editLead('${l.id}')">
+                <div class="flex justify-between items-start">
+                  <h5 class="text-xs font-bold text-white">${esc(l.company)}</h5>
+                  <span class="text-[11px] font-bold text-emerald-400">${sym}${Number(l.value).toLocaleString()}</span>
+                </div>
+                <div class="text-[10px] text-slate-400 flex justify-between items-center">
+                  <span class="bg-slate-800 px-1.5 py-0.5 rounded text-slate-300">${esc(l.tier)}</span>
+                  <span>${esc(l.owner || 'Unassigned')}</span>
+                </div>
+              </div>
+            `).join('')}
           </div>
-          ${m.notes ? `<p class="text-xs text-slate-400 bg-slate-950 p-2.5 rounded-lg border border-slate-800/80">${m.notes}</p>` : ''}
         `;
-        container.appendChild(div);
+        container.appendChild(col);
       });
     }
 
-    function openMeetingEmailGeneratorModal() {
-      const sample = `Subject: Sponsorship Pitch Meeting Request - [Your Event Name 2026]\n\nDear Brand Marketing Team,\n\nI hope this email finds you well. On behalf of our Student Society, I am writing to invite [Company Name] to partner with us as an Official Sponsor for our upcoming flagship event.\n\nKey Highlights:\n- Expected Audience: 2,000+ University Students & Young Professionals\n- Brand Engagement: Stall placement, Main Stage Backdrop & Digital Promotion\n\nWe would love to schedule a brief 10-minute pitch call this week to share our sponsorship tiers (Title, Gold, Silver).\n\nBest regards,\nCorporate Relations Lead`;
-      document.getElementById('email-gen-output').value = sample;
-      openModal('email-generator-modal');
-    }
+    function toggleViewMode() {
+      const tableView = document.getElementById('table-view-container');
+      const kanbanView = document.getElementById('kanban-view-container');
+      const modeText = document.getElementById('view-mode-text');
 
-    function copyMeetingEmail() {
-      const txt = document.getElementById('email-gen-output');
-      txt.select();
-      navigator.clipboard.writeText(txt.value);
-      alert('Email copied to clipboard!');
-    }
-
-    // Leads & Pipeline Logic
-    function handleAddLead(e) {
-      e.preventDefault();
-      const editId = document.getElementById('lead-edit-id').value;
-
-      const leadData = {
-        id: editId || Date.now().toString(),
-        company: document.getElementById('lead-company').value,
-        tier: document.getElementById('lead-tier').value,
-        value: parseFloat(document.getElementById('lead-value').value) || 0,
-        status: document.getElementById('lead-status').value,
-        owner: document.getElementById('lead-owner').value || 'Unassigned',
-        email: document.getElementById('lead-email').value,
-        followup: document.getElementById('lead-followup').value
-      };
-
-      if (editId) {
-        const idx = appState.leads.findIndex(l => l.id === editId);
-        if (idx !== -1) appState.leads[idx] = leadData;
+      if (window.appState.viewMode === 'table') {
+        window.appState.viewMode = 'kanban';
+        tableView.classList.add('hidden');
+        kanbanView.classList.remove('hidden');
+        modeText.innerText = 'Table View';
       } else {
-        appState.leads.push(leadData);
+        window.appState.viewMode = 'table';
+        kanbanView.classList.add('hidden');
+        tableView.classList.remove('hidden');
+        modeText.innerText = 'Kanban View';
+      }
+    }
+
+    function handleSaveLead(e) {
+      e.preventDefault();
+      const id = document.getElementById('lead-id').value;
+      const company = document.getElementById('lead-company').value.trim();
+      const tier = document.getElementById('lead-tier').value;
+      const value = parseFloat(document.getElementById('lead-value').value) || 0;
+      const status = document.getElementById('lead-status').value;
+      const owner = document.getElementById('lead-owner').value;
+      const email = document.getElementById('lead-email').value.trim();
+      const followup = document.getElementById('lead-followup').value;
+      const notes = document.getElementById('lead-notes').value.trim();
+
+      const leadData = { id: id || 'lead_' + Date.now(), company, tier, value, status, owner, email, followup, notes };
+
+      if (id) {
+        const idx = window.appState.leads.findIndex(l => l.id === id);
+        if (idx !== -1) window.appState.leads[idx] = leadData;
+        showToast('Updated lead details', 'success');
+      } else {
+        window.appState.leads.unshift(leadData);
+        showToast('Added new sponsor prospect!', 'success');
+        if (status === 'Closed-Won') triggerConfetti();
       }
 
-      saveData();
       closeModal('add-lead-modal');
+      saveToLocalStorage();
       renderAll();
     }
 
     function editLead(id) {
-      const lead = appState.leads.find(l => l.id === id);
+      const lead = window.appState.leads.find(l => l.id === id);
       if (!lead) return;
 
-      document.getElementById('lead-edit-id').value = lead.id;
+      document.getElementById('modal-lead-title').innerHTML = `<i class="fa-solid fa-pen-to-square text-indigo-400"></i> Edit ${esc(lead.company)}`;
+      document.getElementById('lead-id').value = lead.id;
       document.getElementById('lead-company').value = lead.company;
       document.getElementById('lead-tier').value = lead.tier;
       document.getElementById('lead-value').value = lead.value;
       document.getElementById('lead-status').value = lead.status;
-      document.getElementById('lead-owner').value = lead.owner;
-      document.getElementById('lead-email').value = lead.email;
-      document.getElementById('lead-followup').value = lead.followup;
-      document.getElementById('lead-modal-title').innerText = 'Edit Sponsor Lead';
+      document.getElementById('lead-owner').value = lead.owner || 'You';
+      document.getElementById('lead-email').value = lead.email || '';
+      document.getElementById('lead-followup').value = lead.followup || '';
+      document.getElementById('lead-notes').value = lead.notes || '';
 
       openModal('add-lead-modal');
     }
 
     function deleteLead(id) {
-      appState.leads = appState.leads.filter(l => l.id !== id);
-      saveData();
+      window.appState.leads = window.appState.leads.filter(l => l.id !== id);
+      saveToLocalStorage();
       renderAll();
-    }
-
-    function toggleViewMode() {
-      appState.viewMode = appState.viewMode === 'table' ? 'kanban' : 'table';
-      document.getElementById('view-mode-text').innerText = appState.viewMode === 'table' ? 'Kanban View' : 'Table View';
-      renderLeadsTable();
-    }
-
-    function renderLeadsTable() {
-      const search = document.getElementById('lead-search')?.value.toLowerCase() || '';
-      const filter = document.getElementById('lead-status-filter')?.value || 'ALL';
-
-      const filtered = appState.leads.filter(l => {
-        const matchesSearch = l.company.toLowerCase().includes(search) || l.owner.toLowerCase().includes(search);
-        const matchesFilter = filter === 'ALL' || l.status === filter;
-        return matchesSearch && matchesFilter;
-      });
-
-      const tableContainer = document.getElementById('table-view-container');
-      const kanbanContainer = document.getElementById('kanban-view-container');
-
-      if (appState.viewMode === 'table') {
-        tableContainer.classList.remove('hidden');
-        kanbanContainer.classList.add('hidden');
-
-        const tbody = document.getElementById('leads-table-body');
-        tbody.innerHTML = '';
-
-        filtered.forEach(lead => {
-          const tr = document.createElement('tr');
-          tr.className = 'hover:bg-slate-800/40 transition';
-          tr.innerHTML = `
-            <td class="px-4 py-3 font-semibold text-white">${lead.company}</td>
-            <td class="px-4 py-3 text-slate-400">${lead.tier}</td>
-            <td class="px-4 py-3 font-bold text-indigo-300">${appState.currencySymbol}${lead.value.toLocaleString()}</td>
-            <td class="px-4 py-3">
-              <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold ${getStatusBadgeClass(lead.status)}">
-                ${lead.status}
-              </span>
-            </td>
-            <td class="px-4 py-3 text-slate-400">${lead.email || '-'}</td>
-            <td class="px-4 py-3 text-slate-400">${lead.followup || '-'}</td>
-            <td class="px-4 py-3 text-slate-300">${lead.owner}</td>
-            <td class="px-4 py-3 text-right space-x-2">
-              <button onclick="editLead('${lead.id}')" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-pen-to-square"></i></button>
-              <button onclick="deleteLead('${lead.id}')" class="text-slate-600 hover:text-rose-400 transition"><i class="fa-solid fa-trash"></i></button>
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
-      } else {
-        tableContainer.classList.add('hidden');
-        kanbanContainer.classList.remove('hidden');
-        kanbanContainer.innerHTML = '';
-
-        const stages = ['Prospect', 'Contacted', 'Pitch Sent', 'Meeting Scheduled', 'Closed-Won', 'Closed-Lost'];
-        stages.forEach(stage => {
-          const stageLeads = filtered.filter(l => l.status === stage);
-          const col = document.createElement('div');
-          col.className = 'glass-card p-3 rounded-xl border border-slate-800 space-y-3 min-h-[250px]';
-          col.innerHTML = `
-            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-              <h4 class="text-xs font-bold text-white uppercase tracking-wider">${stage}</h4>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-400">${stageLeads.length}</span>
-            </div>
-            <div class="space-y-2">
-              ${stageLeads.map(l => `
-                <div class="bg-slate-900 p-3 rounded-lg border border-slate-800 space-y-1.5 cursor-pointer hover:border-indigo-500/50 transition" onclick="editLead('${l.id}')">
-                  <div class="font-semibold text-xs text-white">${l.company}</div>
-                  <div class="text-[11px] font-bold text-indigo-400">${appState.currencySymbol}${l.value.toLocaleString()}</div>
-                  <div class="text-[10px] text-slate-500">${l.tier}</div>
-                </div>
-              `).join('')}
-            </div>
-          `;
-          kanbanContainer.appendChild(col);
-        });
-      }
-    }
-
-    function getStatusBadgeClass(status) {
-      switch (status) {
-        case 'Prospect': return 'bg-slate-800 text-slate-300';
-        case 'Contacted': return 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30';
-        case 'Pitch Sent': return 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30';
-        case 'Meeting Scheduled': return 'bg-amber-500/20 text-amber-300 border border-amber-500/30';
-        case 'Closed-Won': return 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
-        case 'Closed-Lost': return 'bg-rose-500/20 text-rose-400 border border-rose-500/30';
-        default: return 'bg-slate-800 text-slate-300';
-      }
-    }
-
-    // Weekly Plan Logic
-    function toggleWeeklyTask(weekIdx, taskIdx) {
-      if (appState.weeklyPlan[weekIdx]?.tasks[taskIdx]) {
-        appState.weeklyPlan[weekIdx].tasks[taskIdx].done = !appState.weeklyPlan[weekIdx].tasks[taskIdx].done;
-        saveData();
-        renderWeeklyPlan();
-      }
+      showToast('Lead removed', 'info');
     }
 
     function renderWeeklyPlan() {
       const container = document.getElementById('weekly-plan-container');
       container.innerHTML = '';
 
-      appState.weeklyPlan.forEach((w, wIdx) => {
-        const div = document.createElement('div');
-        div.className = 'glass-card p-4 rounded-xl border border-slate-800 space-y-3';
-        div.innerHTML = `
-          <div>
-            <span class="text-[10px] uppercase font-extrabold tracking-wider text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">${w.week}</span>
-            <h3 class="font-bold text-sm text-white mt-1">${w.title}</h3>
+      (window.appState.weeklyPlan || []).forEach((week, wIndex) => {
+        const card = document.createElement('div');
+        card.className = "glass-card p-4 rounded-xl border border-slate-800 flex flex-col justify-between space-y-4 relative overflow-hidden";
+        const completedTasks = week.tasks.filter(t => t.completed).length;
+        const totalTasks = week.tasks.length;
+        const percent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+        card.innerHTML = `
+          <div class="space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+              <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Week ${week.weekNum}</span>
+              <span class="text-xs font-bold ${percent === 100 ? 'text-emerald-400' : 'text-slate-400'}">${completedTasks}/${totalTasks} (${percent}%)</span>
+            </div>
+
+            <h3 class="text-xs font-bold text-white leading-snug">${esc(week.title)}</h3>
+
+            <div class="space-y-2 pt-1">
+              ${week.tasks.map((task, tIndex) => `
+                <div class="flex items-start gap-2 bg-slate-900/60 p-2 rounded-lg border border-slate-800/60">
+                  <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleWeeklyTask(${wIndex},${tIndex})" class="mt-0.5 rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                  <span class="text-xs ${task.completed ? 'line-through text-slate-500' : 'text-slate-300'} flex-1">${esc(task.text)}</span>
+                  <button onclick="deleteWeeklyTask(${wIndex},${tIndex})" class="text-slate-600 hover:text-rose-400 text-[10px]"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+              `).join('')}
+            </div>
           </div>
-          <div class="space-y-2">
-            ${w.tasks.map((t, tIdx) => `
-              <div onclick="toggleWeeklyTask(${wIdx}, ${tIdx})" class="flex items-start gap-2.5 cursor-pointer text-xs p-1.5 rounded hover:bg-slate-800/60 transition">
-                <i class="fa-solid ${t.done ? 'fa-square-check text-emerald-400' : 'fa-square text-slate-600'} mt-0.5"></i>
-                <span class="${t.done ? 'line-through text-slate-500' : 'text-slate-300'}">${t.text}</span>
-              </div>
-            `).join('')}
+
+          <div class="pt-2 border-t border-slate-800">
+            <button onclick="addWeeklyTaskPrompt(${wIndex})" class="w-full py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs text-indigo-400 hover:text-indigo-300 font-semibold transition flex items-center justify-center gap-1">
+              <i class="fa-solid fa-plus text-[10px]"></i> Add Action Task
+            </button>
           </div>
         `;
-        container.appendChild(div);
+        container.appendChild(card);
       });
     }
 
-    // Gemini AI Generator Simulation
-    function generateGeminiPitch() {
-      const company = document.getElementById('ai-company').value || 'Target Sponsor';
-      const docType = document.getElementById('ai-doc-type').value;
-      const output = document.getElementById('ai-output');
-
-      output.value = 'Generating customized pitch draft using Gemini AI co-pilot...';
-
-      setTimeout(() => {
-        if (docType === 'pitch') {
-          output.value = `Subject: Official Sponsorship Proposal for ${company}\n\nDear ${company} Partnerships Team,\n\nOur Student Society is organizing its premier annual summit with over 2,500 expected attendees across major Pakistani universities.\n\nPartnering with us gives ${company} direct visibility through:\n- Dedicated Brand Stall & Product Sampling Station\n- Main Stage LED Backdrop Logo Placement\n- Social Media Campaigns reaching 15,000+ students\n\nWe would love to set up a 10-minute discovery call to discuss custom sponsorship packages in PKR.\n\nWarm regards,\nSponsorship Lead`;
-        } else if (docType === 'tiers') {
-          output.value = `SPONSORSHIP TIER MATRIX (PKR)\n\n1. TITLE SPONSOR - Rs. 500,000\n   - Exclusive "Presented by ${company}" Naming Rights\n   - Premium Stall (20x20 ft) at entrance\n   - 5-minute keynote address on main stage\n\n2. GOLD SPONSOR - Rs. 250,000\n   - Prominent logo placement on all flyers & standees\n   - Standard Stall (10x10 ft)\n   - VIP Pass Allocation\n\n3. SILVER SPONSOR - Rs. 100,000\n   - Social Media shoutouts & Logo on website\n   - Certificate distribution branding`;
-        } else if (docType === 'followup') {
-          output.value = `Subject: Following up: Sponsorship Partnership with ${company}\n\nHi ${company} Team,\n\nI wanted to quickly follow up on our previous email regarding sponsorship opportunities for our upcoming student event.\n\nWe are locking in our official partners this week and would love to include ${company}.\n\nPlease let me know if you have 5 minutes for a quick chat tomorrow.\n\nBest regards,`;
-        } else {
-          output.value = `Handling Budget Limitations with ${company}:\n\n"Thank you for sharing your current budget constraints. We completely understand! In lieu of a direct monetary sponsorship, we would be thrilled to explore an In-Kind partnership (such as providing beverages, vouchers, or printing services for our 2,000 guests) in exchange for brand exposure."`;
-        }
-      }, 600);
+    function toggleWeeklyTask(wIndex, tIndex) {
+      window.appState.weeklyPlan[wIndex].tasks[tIndex].completed = !window.appState.weeklyPlan[wIndex].tasks[tIndex].completed;
+      saveToLocalStorage();
+      renderWeeklyPlan();
     }
 
-    // CSV Functions
-    function exportToCSV() {
-      if (appState.leads.length === 0) {
-        alert('No leads to export.');
-        return;
+    function addWeeklyTaskPrompt(wIndex) {
+      const text = prompt("Enter new action item for Week " + (wIndex + 1) + ":");
+      if (text && text.trim()) {
+        window.appState.weeklyPlan[wIndex].tasks.push({ id: 'task_' + Date.now(), text: text.trim(), completed: false });
+        saveToLocalStorage();
+        renderWeeklyPlan();
+        showToast('Task added!', 'success');
       }
-      let csv = 'Company,Tier,Value,Status,Email,Owner\n';
-      appState.leads.forEach(l => {
-        csv += `"${l.company}","${l.tier}",${l.value},"${l.status}","${l.email}","${l.owner}"\n`;
-      });
-
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'SponsorPulse_Leads.csv';
-      a.click();
     }
 
-    function importCSVData() {
-      const input = document.getElementById('csv-file-input');
-      if (!input.files || input.files.length === 0) {
-        alert('Please select a CSV file first.');
-        return;
-      }
+    function deleteWeeklyTask(wIndex, tIndex) {
+      window.appState.weeklyPlan[wIndex].tasks.splice(tIndex, 1);
+      saveToLocalStorage();
+      renderWeeklyPlan();
+    }
 
-      const file = input.files[0];
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const text = e.target.result;
-        const lines = text.split('\n').slice(1);
-        let importedCount = 0;
-
-        lines.forEach(line => {
-          if (!line.trim()) return;
-          const parts = line.split(',').map(p => p.replace(/"/g, '').trim());
-          if (parts[0]) {
-            appState.leads.push({
-              id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
-              company: parts[0] || 'Imported Lead',
-              tier: parts[1] || 'Gold Sponsor',
-              value: parseFloat(parts[2]) || 50000,
-              status: parts[3] || 'Prospect',
-              email: parts[4] || '',
-              owner: parts[5] || 'Unassigned',
-              followup: ''
-            });
-            importedCount++;
-          }
-        });
-
-        saveData();
-        closeModal('import-csv-modal');
-        renderAll();
-        alert(`Successfully imported ${importedCount} leads!`);
-      };
-      reader.readAsText(file);
+    function resetWeeklyPlanToDefault() {
+      window.appState.weeklyPlan = clone(defaultWeeklyPlan);
+      saveToLocalStorage();
+      renderWeeklyPlan();
+      showToast('Reset roadmap to standard blueprint.', 'info');
     }
 
     function saveGoogleSheetURL() {
-      appState.googleSheetUrl = document.getElementById('google-sheet-url').value;
-      saveData();
-      alert('Google Sheet Link saved!');
+      const url = document.getElementById('google-sheet-url').value;
+      localStorage.setItem('sponsor_pulse_sheet_url', url);
+      showToast('Saved Sheet link!', 'success');
     }
 
     function openGoogleSheetURL() {
-      if (appState.googleSheetUrl) {
-        window.open(appState.googleSheetUrl, '_blank');
-      } else {
-        alert('Please enter and save a valid Google Sheet URL first.');
+      const url = document.getElementById('google-sheet-url').value || localStorage.getItem('sponsor_pulse_sheet_url');
+      if (url) window.open(url, '_blank');
+      else showToast('Please enter a Google Sheet URL first.', 'warning');
+    }
+
+    // Gemini AI Chat
+    async function sendGeminiPrompt(customPromptText) {
+      const inputEl = document.getElementById('gemini-input');
+      const prompt = customPromptText || inputEl.value.trim();
+
+      if (!prompt) return;
+      if (!customPromptText) inputEl.value = '';
+
+      appendChatMessage('user', prompt);
+      const loadingId = appendChatLoading();
+
+      try {
+        const apiKey = ""; // Insert Gemini API key if available
+        if (!apiKey) {
+          setTimeout(() => {
+            removeChatLoading(loadingId);
+            appendChatMessage('ai', `
+              <p><strong>Gemini AI Assistant Note:</strong></p>
+              <p>To enable live AI generation, configure your Gemini API Key in the script, or use our quick prompt templates to generate customized emails in PKR format offline!</p>
+            `);
+          }, 800);
+          return;
+        }
+
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const systemInstruction = `You are Gemini, an expert Sponsorship & Finance Advisor for student society events in Pakistan. Provide response in PKR context using bold text and bullet points.`;
+
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            systemInstruction: { parts: [{ text: systemInstruction }] }
+          })
+        });
+
+        const data = await response.json();
+        removeChatLoading(loadingId);
+
+        if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+          appendChatMessage('ai', data.candidates[0].content.parts[0].text);
+        } else {
+          appendChatMessage('ai', "Could not generate response at this time. Please try again.");
+        }
+      } catch (err) {
+        removeChatLoading(loadingId);
+        appendChatMessage('ai', "Error connecting to AI service. Please check your internet connection.");
       }
+    }
+
+    function useGeminiTemplate(type) {
+      if (type === 'zero') {
+        sendGeminiPrompt("Give us a 5-step checklist for a university society in Pakistan starting its sponsorship drive today from zero.");
+      } else if (type === 'meeting_invite') {
+        sendGeminiPrompt("Draft a cold email in PKR context to request a 15-minute sponsorship pitch call with a corporate brand head.");
+      } else if (type === 'packages') {
+        sendGeminiPrompt("Outline Title (Rs. 200k), Gold (Rs. 100k), and Silver (Rs. 50k) sponsorship packages with clear deliverables for sponsors in Pakistan.");
+      }
+    }
+
+    function appendChatMessage(sender, htmlContent) {
+      const chatBody = document.getElementById('gemini-chat-body');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = "flex items-start gap-3" + (sender === 'user' ? ' justify-end' : '');
+
+      if (sender === 'user') {
+        msgDiv.innerHTML = `
+          <div class="bg-indigo-600 text-white p-3.5 rounded-xl rounded-tr-none max-w-xl text-xs leading-relaxed space-y-1">
+            <p>${esc(htmlContent)}</p>
+          </div>
+          <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-300 flex items-center justify-center shrink-0 font-bold text-xs">You</div>
+        `;
+      } else {
+        msgDiv.innerHTML = `
+          <div class="w-8 h-8 rounded-lg bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-robot text-sm"></i>
+          </div>
+          <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl rounded-tl-none max-w-2xl text-xs leading-relaxed text-slate-200 space-y-2">
+            ${htmlContent}
+          </div>
+        `;
+      }
+
+      chatBody.appendChild(msgDiv);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function appendChatLoading() {
+      const id = 'loading_' + Date.now();
+      const chatBody = document.getElementById('gemini-chat-body');
+      const msgDiv = document.createElement('div');
+      msgDiv.id = id;
+      msgDiv.className = "flex items-start gap-3";
+      msgDiv.innerHTML = `
+        <div class="w-8 h-8 rounded-lg bg-indigo-600/30 text-indigo-300 flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-robot text-sm"></i>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl text-xs text-slate-400 flex items-center gap-2">
+          <i class="fa-solid fa-circle-notch animate-spin text-indigo-400"></i> Gemini is thinking...
+        </div>
+      `;
+      chatBody.appendChild(msgDiv);
+      chatBody.scrollTop = chatBody.scrollHeight;
+      return id;
+    }
+
+    function removeChatLoading(id) {
+      const el = document.getElementById(id);
+      if (el) el.remove();
+    }
+
+    function clearGeminiChat() {
+      document.getElementById('gemini-chat-body').innerHTML = '';
+      showToast('Chat history cleared', 'info');
+    }
+
+    // Tab Navigation
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
+        btn.classList.add('text-slate-400');
+      });
+
+      const activeTabEl = document.getElementById(`view-${tabId}`);
+      if (activeTabEl) activeTabEl.classList.remove('hidden');
+
+      const activeBtn = document.getElementById(`tab-${tabId}`);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
+        activeBtn.classList.remove('text-slate-400');
+      }
+
+      window.appState.activeTab = tabId;
+    }
+
+    function openMeetingEmailGeneratorModal() {
+      openModal('email-gen-modal');
+    }
+
+    function copyMeetingEmailTemplate() {
+      const text = document.getElementById('email-template-text').innerText;
+      navigator.clipboard.writeText(text);
+      showToast('Email template copied to clipboard!', 'success');
+    }
+
+    function triggerConfetti() {
+      if (typeof confetti === 'function') {
+        confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 } });
+      }
+    }
+
+    /* ===== Storage ===== */
+    function saveToLocalStorage() {
+      const a = S();
+      try {
+        localStorage.setItem('sponsorpulse_pk_data', JSON.stringify({
+          requirements: a.requirements,
+          meetings: a.meetings,
+          leads: a.leads,
+          weeklyPlan: a.weeklyPlan,
+          targetGoal: a.targetGoal,
+          currencySymbol: a.currencySymbol,
+          daysRemaining: a.daysRemaining,
+          notes: a.notes,
+          team: a.team,
+          tiers: a.tiers,
+          categories: a.categories,
+          lastName: a.lastName,
+          firebaseConfig: firebaseConfig
+        }));
+      } catch(e) {
+        showToast('Could not save data (browser storage blocked or full)', 'warning');
+      }
+    }
+
+    function loadLocalStorage() {
+      const a = S();
+      let d = null;
+      try {
+        d = JSON.parse(localStorage.getItem('sponsorpulse_pk_data') || 'null');
+      } catch(e) {
+        console.error(e);
+      }
+      d = d || {};
+      a.requirements = d.requirements || clone(defaultRequirements);
+      a.meetings = d.meetings || clone(defaultMeetings);
+      a.leads = d.leads || clone(defaultLeads);
+      a.weeklyPlan = d.weeklyPlan || clone(defaultWeeklyPlan);
+      a.targetGoal = d.targetGoal ?? 500000;
+      a.currencySymbol = d.currencySymbol || 'Rs. ';
+      a.daysRemaining = d.daysRemaining ?? 30;
+      a.notes = d.notes || clone(defaultNotes);
+      a.team = d.team || [...defaultTeam];
+      a.tiers = d.tiers || clone(defaultTiers);
+      a.categories = d.categories || [...defaultCats];
+      a.lastName = d.lastName || '';
+      a.firebaseConfig = firebaseConfig;
+    }
+
+    /* ===== Cycle Requirement Status ===== */
+    function cycleReqStatus(idx) {
+      const statuses = ['Needed', 'In Discussion', 'Secured'];
+      const current = window.appState.requirements[idx].status || 'Needed';
+      const nextIdx = (statuses.indexOf(current) + 1) % statuses.length;
+      window.appState.requirements[idx].status = statuses[nextIdx];
+      saveToLocalStorage();
+      renderAll();
+      showToast(`Requirement status changed to ${statuses[nextIdx]}`, 'info');
+      if (statuses[nextIdx] === 'Secured') triggerConfetti();
+    }
+
+    /* ===== Convert Meeting to Closed-Won ===== */
+    function convertToClosedWon(meetingId) {
+      const meeting = window.appState.meetings.find(m => m.id === meetingId);
+      if (!meeting) return;
+
+      let lead = window.appState.leads.find(l => l.company.toLowerCase() === meeting.company.toLowerCase());
+      if (lead) {
+        lead.status = 'Closed-Won';
+      } else {
+        window.appState.leads.unshift({
+          id: 'lead_' + Date.now(),
+          company: meeting.company,
+          tier: meeting.tier,
+          value: tierValue(meeting.tier),
+          status: 'Closed-Won',
+          email: '',
+          followup: '',
+          owner: meeting.owner,
+          notes: meeting.agenda || 'Closed from meeting pitch.'
+        });
+      }
+
+      saveToLocalStorage();
+      renderAll();
+      showToast(`Sponsorship with ${meeting.company} marked as Closed-Won! 🎉`, 'success');
+      triggerConfetti();
+    }
+
+    /* ===== Notes & Requirements Management ===== */
+    let activeCompleteNoteId = null;
+
+    function renderNotes() {
+      const notes = window.appState.notes || [];
+      const pendingList = document.getElementById('notes-pending-list');
+      const doneList = document.getElementById('notes-done-list');
+      const badge = document.getElementById('notes-badge');
+
+      const pending = notes.filter(n => !n.done);
+      const done = notes.filter(n => n.done);
+
+      document.getElementById('notes-pending-count').innerText = pending.length;
+      document.getElementById('notes-done-count').innerText = done.length;
+
+      if (pending.length > 0) {
+        badge.classList.remove('hidden');
+        badge.classList.add('flex');
+        badge.innerText = pending.length;
+      } else {
+        badge.classList.add('hidden');
+        badge.classList.remove('flex');
+      }
+
+      pendingList.innerHTML = pending.length === 0 
+        ? '<p class="text-xs text-slate-500 py-4 text-center">No pending notes or requirements.</p>'
+        : pending.map(n => {
+            const priorityColor = n.priority === 'High' ? 'bg-rose-500/20 text-rose-300 border-rose-500/30' : (n.priority === 'Low' ? 'bg-slate-800 text-slate-400 border-slate-700' : 'bg-amber-500/20 text-amber-300 border-amber-500/30');
+            return `
+              <div class="glass-card p-3 rounded-xl border border-slate-800 flex items-center justify-between gap-3 note-in">
+                <div class="space-y-1 flex-1">
+                  <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold ${priorityColor}">${esc(n.priority)}</span>
+                    <span class="text-[10px] font-semibold text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">${esc(n.kind)}</span>
+                  </div>
+                  <p class="text-xs text-slate-200 font-medium">${esc(n.text)}</p>
+                </div>
+                <div class="flex items-center gap-1">
+                  <button onclick="openCompleteNote('${n.id}')" class="px-2.5 py-1 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white rounded-lg text-xs font-semibold transition border border-emerald-500/30 flex items-center gap-1">
+                    <i class="fa-solid fa-check"></i> Complete
+                  </button>
+                  <button onclick="deleteNote('${n.id}')" class="p-1.5 text-slate-500 hover:text-rose-400 text-xs transition">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join('');
+
+      doneList.innerHTML = done.length === 0
+        ? '<p class="text-xs text-slate-500 py-4 text-center">No completed notes yet.</p>'
+        : done.map(n => `
+            <div class="glass-card p-3 rounded-xl border border-slate-800 flex items-center justify-between gap-3 note-in opacity-75">
+              <div class="space-y-1 flex-1">
+                <p class="text-xs text-slate-400 line-through">${esc(n.text)}</p>
+                <p class="text-[10px] text-emerald-400">Done by <span class="font-bold">${esc(n.doneBy)}</span></p>
+              </div>
+              <button onclick="deleteNote('${n.id}')" class="p-1.5 text-slate-500 hover:text-rose-400 text-xs transition">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+          `).join('');
+    }
+
+    function handleAddNote(e) {
+      e.preventDefault();
+      const text = document.getElementById('note-text').value.trim();
+      const kind = document.getElementById('note-kind').value;
+      const priority = document.getElementById('note-priority').value;
+
+      if (!text) return;
+
+      window.appState.notes.unshift({
+        id: 'n_' + Date.now(),
+        text,
+        kind,
+        priority,
+        created: Date.now(),
+        done: false
+      });
+
+      document.getElementById('note-text').value = '';
+      saveToLocalStorage();
+      renderNotes();
+      showToast('Note added!', 'success');
+    }
+
+    function openCompleteNote(id) {
+      activeCompleteNoteId = id;
+      const note = window.appState.notes.find(n => n.id === id);
+      if (!note) return;
+
+      document.getElementById('complete-note-text').innerText = note.text;
+      document.getElementById('complete-name').value = window.appState.lastName || '';
+      openModal('complete-note-modal');
+    }
+
+    function submitComplete(e) {
+      e.preventDefault();
+      const name = document.getElementById('complete-name').value.trim();
+      if (!name || !activeCompleteNoteId) return;
+
+      const note = window.appState.notes.find(n => n.id === activeCompleteNoteId);
+      if (note) {
+        note.done = true;
+        note.doneBy = name;
+        window.appState.lastName = name;
+      }
+
+      closeModal('complete-note-modal');
+      saveToLocalStorage();
+      renderNotes();
+      showToast('Task marked completed!', 'success');
+      triggerConfetti();
+    }
+
+    function deleteNote(id) {
+      window.appState.notes = window.appState.notes.filter(n => n.id !== id);
+      saveToLocalStorage();
+      renderNotes();
+      showToast('Note deleted', 'info');
+    }
+
+    function clearCompletedNotes() {
+      window.appState.notes = window.appState.notes.filter(n => !n.done);
+      saveToLocalStorage();
+      renderNotes();
+      showToast('Cleared completed notes', 'info');
+    }
+
+    function openSettings() {
+      document.getElementById('settings-target').value = window.appState.targetGoal;
+      document.getElementById('settings-currency').value = window.appState.currencySymbol;
+      document.getElementById('settings-days').value = window.appState.daysRemaining;
+      
+      const mgr = document.getElementById('list-managers');
+      if (mgr) {
+        mgr.innerHTML = `
+          <div class="space-y-2">
+            <div class="flex justify-between items-center"><label class="text-xs font-semibold text-slate-300">Team Members</label><button type="button" onclick="quickAdd('team')" class="text-[10px] text-indigo-400 font-bold hover:underline">+ Add Member</button></div>
+            <div class="flex flex-wrap gap-1">${(window.appState.team || []).map((t, idx) => `<span class="px-2 py-0.5 bg-slate-800 text-slate-300 rounded text-[11px] flex items-center gap-1">${esc(t)} <i onclick="removeListItem('team', ${idx})" class="fa-solid fa-xmark text-[9px] cursor-pointer hover:text-rose-400"></i></span>`).join('')}</div>
+          </div>
+          <div class="space-y-2">
+            <div class="flex justify-between items-center"><label class="text-xs font-semibold text-slate-300">Sponsorship Tiers</label><button type="button" onclick="quickAdd('tier')" class="text-[10px] text-indigo-400 font-bold hover:underline">+ Add Tier</button></div>
+            <div class="flex flex-wrap gap-1">${(window.appState.tiers || []).map((tr, idx) => `<span class="px-2 py-0.5 bg-slate-800 text-slate-300 rounded text-[11px] flex items-center gap-1">${esc(tr.name)} (Rs.${tr.value.toLocaleString()}) <i onclick="removeListItem('tiers', ${idx})" class="fa-solid fa-xmark text-[9px] cursor-pointer hover:text-rose-400"></i></span>`).join('')}</div>
+          </div>
+          <div class="space-y-2">
+            <div class="flex justify-between items-center"><label class="text-xs font-semibold text-slate-300">Requirement Categories</label><button type="button" onclick="quickAdd('category')" class="text-[10px] text-indigo-400 font-bold hover:underline">+ Add Category</button></div>
+            <div class="flex flex-wrap gap-1">${(window.appState.categories || []).map((c, idx) => `<span class="px-2 py-0.5 bg-slate-800 text-slate-300 rounded text-[11px] flex items-center gap-1">${esc(c)} <i onclick="removeListItem('categories', ${idx})" class="fa-solid fa-xmark text-[9px] cursor-pointer hover:text-rose-400"></i></span>`).join('')}</div>
+          </div>
+        `;
+      }
+      openModal('settings-modal');
+    }
+
+    function saveSettings() {
+      const target = parseFloat(document.getElementById('settings-target').value);
+      const currency = document.getElementById('settings-currency').value;
+      const days = parseInt(document.getElementById('settings-days').value);
+
+      if (!isNaN(target)) window.appState.targetGoal = target;
+      if (currency) window.appState.currencySymbol = currency;
+      if (!isNaN(days)) window.appState.daysRemaining = days;
+
+      saveToLocalStorage();
+      renderAll();
+      closeModal('settings-modal');
+      showToast('Settings saved!', 'success');
+    }
+
+    function fillSelects() {
+      const team = window.appState.team || [];
+      const tiers = window.appState.tiers || [];
+      const cats = window.appState.categories || [];
+
+      const fillOptions = (elemId, items, valKey = null, textKey = null) => {
+        const el = document.getElementById(elemId);
+        if (!el) return;
+        el.innerHTML = items.map(item => {
+          const val = valKey ? item[valKey] : item;
+          const txt = textKey ? item[textKey] : item;
+          return `<option value="${esc(val)}">${esc(txt)}</option>`;
+        }).join('');
+      };
+
+      fillOptions('req-category', cats);
+      fillOptions('meeting-tier', tiers, 'name', 'name');
+      fillOptions('meeting-owner', team);
+      fillOptions('lead-tier', tiers, 'name', 'name');
+      fillOptions('lead-owner', team);
+
+      const datalist = document.getElementById('team-datalist');
+      if (datalist) {
+        datalist.innerHTML = team.map(t => `<option value="${esc(t)}">`).join('');
+      }
+    }
+
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      let bgColor = 'bg-slate-800 text-slate-200 border-slate-700';
+      if (type === 'success') bgColor = 'bg-emerald-900/90 text-emerald-200 border-emerald-700';
+      if (type === 'warning') bgColor = 'bg-amber-900/90 text-amber-200 border-amber-700';
+      if (type === 'error') bgColor = 'bg-rose-900/90 text-rose-200 border-rose-700';
+
+      toast.className = `p-3 rounded-xl border text-xs font-semibold shadow-xl transition-all duration-300 transform translate-y-2 pointer-events-auto ${bgColor}`;
+      toast.innerText = message;
+
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.remove('translate-y-2'), 10);
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    function exportToCSV() {
+      const leads = window.appState.leads || [];
+      if (leads.length === 0) {
+        showToast('No lead data to export', 'warning');
+        return;
+      }
+      let csv = 'Company,Tier,Value,Status,Email,FollowUp,Owner,Notes\n';
+      leads.forEach(l => {
+        csv += `"${(l.company||'').replace(/"/g, '""')}","${(l.tier||'').replace(/"/g, '""')}",${l.value||0},"${(l.status||'').replace(/"/g, '""')}","${(l.email||'').replace(/"/g, '""')}","${(l.followup||'').replace(/"/g, '""')}","${(l.owner||'').replace(/"/g, '""')}","${(l.notes||'').replace(/"/g, '""')}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `sponsorship_leads_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Exported CSV file!', 'success');
+    }
+
+    function handleCSVImport() {
+      const text = document.getElementById('csv-paste-area').value.trim();
+      if (!text) return;
+
+      const lines = text.split('\n');
+      let importedCount = 0;
+
+      lines.forEach((line, idx) => {
+        if (idx === 0 && line.toLowerCase().includes('company')) return;
+        const parts = line.split(',').map(s => s.trim().replace(/^"|"$/g, ''));
+        if (parts.length >= 2 && parts[0]) {
+          window.appState.leads.push({
+            id: 'lead_' + Date.now() + '_' + idx,
+            company: parts[0],
+            tier: parts[1] || 'Gold Sponsor',
+            value: parseFloat(parts[2]) || 100000,
+            status: parts[3] || 'Prospect',
+            email: parts[4] || '',
+            followup: parts[5] || '',
+            owner: parts[6] || 'You',
+            notes: parts[7] || ''
+          });
+          importedCount++;
+        }
+      });
+
+      closeModal('import-csv-modal');
+      document.getElementById('csv-paste-area').value = '';
+      saveToLocalStorage();
+      renderAll();
+      showToast(`Imported ${importedCount} sponsor prospects!`, 'success');
+    }
+
+    let currentQuickType = '';
+    function quickAdd(type) {
+      currentQuickType = type;
+      document.getElementById('quick-title').innerText = 'Add ' + type.charAt(0).toUpperCase() + type.slice(1);
+      document.getElementById('quick-name').value = '';
+      const valWrap = document.getElementById('quick-value-wrap');
+      if (type === 'tier') valWrap.classList.remove('hidden'); else valWrap.classList.add('hidden');
+      openModal('quick-add-modal');
+    }
+
+    function submitQuick(e) {
+      e.preventDefault();
+      const name = document.getElementById('quick-name').value.trim();
+      if (!name) return;
+
+      if (currentQuickType === 'team') {
+        if (!window.appState.team.includes(name)) window.appState.team.push(name);
+      } else if (currentQuickType === 'tier') {
+        const val = parseFloat(document.getElementById('quick-value').value) || 50000;
+        window.appState.tiers.push({ name, value: val });
+      } else if (currentQuickType === 'category') {
+        if (!window.appState.categories.includes(name)) window.appState.categories.push(name);
+      }
+
+      closeModal('quick-add-modal');
+      saveToLocalStorage();
+      openSettings();
+      fillSelects();
+      showToast('Added new item!', 'success');
+    }
+
+    function removeListItem(type, idx) {
+      if (type === 'team') window.appState.team.splice(idx, 1);
+      else if (type === 'tiers') window.appState.tiers.splice(idx, 1);
+      else if (type === 'categories') window.appState.categories.splice(idx, 1);
+
+      saveToLocalStorage();
+      openSettings();
+      fillSelects();
     }
   </script>
 </body>
