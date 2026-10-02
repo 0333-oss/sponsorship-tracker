@@ -69,22 +69,46 @@
       scrollbar-width: none;
     }
   
-    html{scroll-behavior:smooth}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-    @keyframes fade{from{opacity:0}to{opacity:1}}
-    @keyframes pop{from{opacity:0;transform:scale(.96) translateY(6px)}to{opacity:1;transform:none}}
-    .tab-content:not(.hidden),.note-in{animation:fadeUp .3s ease both}
-    .fixed.inset-0.z-50:not(.hidden){animation:fade .15s ease both}
-    .fixed.inset-0.z-50:not(.hidden)>div{animation:pop .2s ease both}
-    .glass-card.max-w-md,.glass-card.max-w-lg{max-height:92vh;overflow-y:auto}
-    td.flex{display:table-cell;vertical-align:middle}
-    td.flex>*{display:inline-block;vertical-align:middle;margin-right:.5rem}
-    button,select,input,textarea{transition:border-color .15s,background-color .15s,box-shadow .15s,transform .1s}
-    input:focus,select:focus,textarea:focus{box-shadow:0 0 0 3px rgba(99,102,241,.18)}
-    button:active:not(:disabled){transform:scale(.97)}
-    select,input[type=date],input[type=datetime-local]{color-scheme:dark}
-    @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+    html { scroll-behavior: smooth; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes pop { from { opacity: 0; transform: scale(.96) translateY(6px); } to { opacity: 1; transform: none; } }
+    .tab-content:not(.hidden), .note-in { animation: fadeUp .3s ease both; }
+    .fixed.inset-0.z-50:not(.hidden) { animation: fade .15s ease both; }
+    .fixed.inset-0.z-50:not(.hidden) > div { animation: pop .2s ease both; }
+    .glass-card.max-w-md, .glass-card.max-w-lg { max-height: 92vh; overflow-y: auto; }
+    button, select, input, textarea { transition: border-color .15s, background-color .15s, box-shadow .15s, transform .1s; }
+    input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px rgba(99, 102, 241, .18); }
+    button:active:not(:disabled) { transform: scale(.97); }
+    select, input[type=date], input[type=datetime-local] { color-scheme: dark; }
+    @media (prefers-reduced-motion: reduce) { * { animation: none!important; transition: none!important; scroll-behavior: auto!important; } }
   </style>
+
+  <!-- Firebase SDKs (Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+  <script>
+    // Hardcoded Firebase Config
+    window.HARDCODED_FIREBASE_CONFIG = {
+      apiKey: "AIzaSyBdS6DU6a1qAjtwsCONrSXEKZ1IWzJ3RQc",
+      authDomain: "sponsorship-tracker-4d736.firebaseapp.com",
+      databaseURL: "https://sponsorship-tracker-4d736-default-rtdb.firebaseio.com",
+      projectId: "sponsorship-tracker-4d736",
+      storageBucket: "sponsorship-tracker-4d736.firebasestorage.app",
+      messagingSenderId: "98189953022",
+      appId: "1:98189953022:web:9dd323b7e49730c97822af"
+    };
+
+    // Auto-initialize Firebase immediately
+    if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+      try {
+        firebase.initializeApp(window.HARDCODED_FIREBASE_CONFIG);
+      } catch (err) {
+        console.error("Firebase init error:", err);
+      }
+    }
+  </script>
 </head>
 <body class="h-full flex flex-col font-sans bg-slate-950 text-slate-100 overflow-x-hidden selection:bg-indigo-500 selection:text-white">
 
@@ -117,8 +141,8 @@
         <!-- Right Controls & Sync Status -->
         <div class="flex items-center gap-3">
           <div id="sync-status">
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
-              <i class="fa-solid fa-database text-xs"></i> Local Storage Active
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <i class="fa-solid fa-bolt text-xs"></i> Firebase Live Sync Active
             </span>
           </div>
 
@@ -139,7 +163,7 @@
         </button>
         <button onclick="switchTab('notes')" id="tab-notes" class="tab-btn px-3.5 py-2 text-xs font-semibold rounded-lg transition flex items-center gap-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 shrink-0">
           <i class="fa-solid fa-note-sticky text-cyan-400"></i> Notes & Requirements
-          <span id="notes-badge" class="hidden min-w-[18px] h-[18px] px-1 rounded-full bg-cyan-500 text-slate-950 text-[10px] font-extrabold items-center justify-center"></span>
+          <span id="notes-badge" class="hidden min-w-[18px] h-[18px] px-1 rounded-full bg-cyan-500 text-slate-950 text-[10px] font-extrabold items-center justify-center">0</span>
         </button>
         <button onclick="switchTab('meetings')" id="tab-meetings" class="tab-btn px-3.5 py-2 text-xs font-semibold rounded-lg transition flex items-center gap-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 shrink-0">
           <i class="fa-solid fa-calendar-days text-emerald-400"></i> Meeting Planner
@@ -213,7 +237,7 @@
       </div>
     </div>
 
-    <!-- TAB 0: DAY 0 KICKSTART GUIDE -->
+    <!-- TAB 0: KICKSTART -->
     <div id="view-kickstart" class="tab-content space-y-6">
       <div class="relative overflow-hidden glass-card p-6 md:p-8 rounded-2xl border border-indigo-500/30 bg-gradient-to-r from-indigo-950/60 via-slate-900 to-slate-950 shadow-2xl">
         <div class="max-w-2xl space-y-3 relative z-10">
@@ -290,7 +314,7 @@
       </div>
     </div>
 
-    <!-- TAB 1: REQUIREMENTS & BUDGET MANAGER -->
+    <!-- TAB 1: REQUIREMENTS -->
     <div id="view-requirements" class="tab-content hidden space-y-6">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900 p-4 rounded-xl border border-slate-800">
         <div>
@@ -351,7 +375,7 @@
       </div>
     </div>
 
-    <!-- TAB: NOTES & REQUIREMENTS -->
+    <!-- TAB 2: NOTES -->
     <div id="view-notes" class="tab-content hidden space-y-6">
       <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
         <div class="flex items-center justify-between gap-3 flex-wrap">
@@ -383,7 +407,7 @@
       </div>
     </div>
 
-    <!-- TAB 2: MEETING PLANNER & SCHEDULER -->
+    <!-- TAB 3: MEETINGS -->
     <div id="view-meetings" class="tab-content hidden space-y-6">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900 p-4 rounded-xl border border-slate-800">
         <div>
@@ -394,9 +418,6 @@
         </div>
 
         <div class="flex items-center gap-2 w-full sm:w-auto">
-          <button onclick="openMeetingEmailGeneratorModal()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-indigo-300 rounded-lg text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5">
-            <i class="fa-regular fa-envelope"></i> Generate Pitch Request Email
-          </button>
           <button onclick="openModal('add-meeting-modal')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold transition shadow-lg shadow-emerald-600/20 flex items-center gap-2">
             <i class="fa-solid fa-calendar-plus"></i> Schedule Pitch Meeting
           </button>
@@ -406,7 +427,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="meetings-list-container"></div>
     </div>
 
-    <!-- TAB 3: PIPELINE & LEADS -->
+    <!-- TAB 4: PIPELINE -->
     <div id="view-pipeline" class="tab-content hidden space-y-6">
       <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 bg-slate-900 p-4 rounded-xl border border-slate-800">
         <div class="flex flex-1 items-center gap-3">
@@ -427,17 +448,12 @@
         </div>
 
         <div class="flex items-center gap-2">
-          <button onclick="toggleViewMode()" id="toggle-view-btn" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 border border-slate-700 transition flex items-center gap-1.5">
-            <i class="fa-solid fa-table-columns"></i> <span id="view-mode-text">Kanban View</span>
-          </button>
-          
           <button onclick="openModal('add-lead-modal')" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition shadow-lg shadow-indigo-600/30 flex items-center gap-2">
             <i class="fa-solid fa-plus"></i> Add Sponsor Prospect
           </button>
         </div>
       </div>
 
-      <!-- Table Container -->
       <div id="table-view-container" class="glass-card rounded-xl border border-slate-800 overflow-hidden shadow-xl">
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs text-slate-300">
@@ -457,12 +473,9 @@
           </table>
         </div>
       </div>
-
-      <!-- Kanban Container -->
-      <div id="kanban-view-container" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4"></div>
     </div>
 
-    <!-- TAB 4: WEEKLY ROADMAP -->
+    <!-- TAB 5: ROADMAP -->
     <div id="view-weekly" class="tab-content hidden space-y-6">
       <div class="flex items-center justify-between bg-slate-900 p-4 rounded-xl border border-slate-800">
         <div>
@@ -471,15 +484,12 @@
           </h2>
           <p class="text-xs text-slate-400">Action plan designed for rapid 30-day sponsorship drive execution.</p>
         </div>
-        <button onclick="resetWeeklyPlanToDefault()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 border border-slate-700 transition">
-          <i class="fa-solid fa-rotate-right mr-1"></i> Reset Suggested Blueprint
-        </button>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5" id="weekly-plan-container"></div>
     </div>
 
-    <!-- TAB 5: SHEETS & CSV -->
+    <!-- TAB 6: SHEETS -->
     <div id="view-sheets" class="tab-content hidden space-y-6">
       <div class="glass-card p-6 rounded-xl border border-slate-800 space-y-6">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
@@ -495,9 +505,6 @@
             <button onclick="exportToCSV()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold transition shadow-lg shadow-emerald-600/20 flex items-center gap-2">
               <i class="fa-solid fa-file-csv text-sm"></i> Export CSV
             </button>
-            <button onclick="openModal('import-csv-modal')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-bold transition flex items-center gap-2">
-              <i class="fa-solid fa-upload"></i> Import CSV Data
-            </button>
           </div>
         </div>
 
@@ -505,1674 +512,686 @@
           <label class="block text-xs font-semibold text-slate-300">Society Shared Google Sheet Link</label>
           <div class="flex gap-2">
             <input type="url" id="google-sheet-url" placeholder="https://docs.google.com/spreadsheets/d/your-sheet-id/edit" class="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
-            <button onclick="saveGoogleSheetURL()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold transition">Save Link</button>
-            <button onclick="openGoogleSheetURL()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-emerald-400 rounded-lg text-xs font-semibold border border-slate-700 transition flex items-center gap-1.5">
-              <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Sheet
-            </button>
+            <button onclick="saveSheetLink()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold border border-slate-700">Save Link</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- TAB 6: GEMINI AI ASSISTANT -->
+    <!-- TAB 7: GEMINI AI -->
     <div id="view-gemini" class="tab-content hidden space-y-6">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="space-y-4">
-          <div class="glass-card p-5 rounded-xl border border-slate-800 space-y-4">
-            <div class="flex items-center gap-2">
-              <div class="p-2 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                <i class="fa-solid fa-wand-magic-sparkles text-lg"></i>
-              </div>
-              <div>
-                <h3 class="text-sm font-bold text-white">Gemini Sponsorship Co-Pilot</h3>
-                <p class="text-[11px] text-slate-400">Instant AI tools in PKR context</p>
-              </div>
-            </div>
-
-            <div class="space-y-2">
-              <button onclick="useGeminiTemplate('zero')" class="w-full text-left p-3 rounded-lg bg-slate-900 hover:bg-amber-950/40 border border-slate-800 hover:border-amber-500/40 transition group">
-                <div class="text-xs font-semibold text-amber-300 group-hover:text-amber-200 flex items-center justify-between">
-                  <span><i class="fa-solid fa-compass-drafting mr-2"></i> Day 0 Action Plan (PKR)</span>
-                  <i class="fa-solid fa-chevron-right text-[10px] opacity-60"></i>
-                </div>
-                <p class="text-[11px] text-slate-400 mt-1">Checklist to launch a sponsorship drive in Pakistan.</p>
-              </button>
-
-              <button onclick="useGeminiTemplate('meeting_invite')" class="w-full text-left p-3 rounded-lg bg-slate-900 hover:bg-emerald-950/40 border border-slate-800 hover:border-emerald-500/40 transition group">
-                <div class="text-xs font-semibold text-emerald-300 group-hover:text-emerald-200 flex items-center justify-between">
-                  <span><i class="fa-solid fa-calendar-check mr-2"></i> Corporate Meeting Invite</span>
-                  <i class="fa-solid fa-chevron-right text-[10px] opacity-60"></i>
-                </div>
-                <p class="text-[11px] text-slate-400 mt-1">Draft email requesting a 15-minute pitch call.</p>
-              </button>
-
-              <button onclick="useGeminiTemplate('packages')" class="w-full text-left p-3 rounded-lg bg-slate-900 hover:bg-cyan-950/40 border border-slate-800 hover:border-cyan-500/40 transition group">
-                <div class="text-xs font-semibold text-cyan-300 group-hover:text-cyan-200 flex items-center justify-between">
-                  <span><i class="fa-solid fa-layer-group mr-2"></i> PKR Package Tiers Breakdown</span>
-                  <i class="fa-solid fa-chevron-right text-[10px] opacity-60"></i>
-                </div>
-                <p class="text-[11px] text-slate-400 mt-1">Title, Gold, Silver tier deliverables in PKR.</p>
-              </button>
-            </div>
+      <div class="glass-card p-6 rounded-xl border border-slate-800 space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center text-lg border border-indigo-500/30">
+            <i class="fa-solid fa-robot"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-white">Gemini AI Pitch Co-Pilot</h2>
+            <p class="text-xs text-slate-400">Generate sponsorship pitch proposals and email outreach copy.</p>
           </div>
         </div>
 
-        <div class="lg:col-span-2 glass-card rounded-xl border border-slate-800 flex flex-col h-[560px]">
-          <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/80 rounded-t-xl">
-            <div class="flex items-center gap-2">
-              <span class="relative flex h-3 w-3">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
-              </span>
-              <span class="text-xs font-bold text-white">Gemini AI Assistant</span>
-            </div>
-            <button onclick="clearGeminiChat()" class="text-xs text-slate-400 hover:text-white transition">
-              <i class="fa-solid fa-trash-can mr-1"></i> Clear Chat
-            </button>
-          </div>
+        <div class="space-y-3">
+          <textarea id="ai-prompt-input" rows="3" placeholder="E.g., Write a cold sponsorship proposal email for a local tech company offering Titanium tier package for Rs. 150,000..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 resize-none"></textarea>
+          <button onclick="generateAIPitch()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg shadow-lg shadow-indigo-600/30 flex items-center gap-2">
+            <i class="fa-solid fa-sparkles"></i> Generate AI Pitch Proposal
+          </button>
+        </div>
 
-          <div id="gemini-chat-body" class="flex-1 p-4 overflow-y-auto space-y-4">
-            <div class="flex items-start gap-3">
-              <div class="w-8 h-8 rounded-lg bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 flex items-center justify-center shrink-0">
-                <i class="fa-solid fa-robot text-sm"></i>
-              </div>
-              <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl rounded-tl-none max-w-2xl text-xs leading-relaxed text-slate-200 space-y-2">
-                <p class="font-bold text-indigo-300">Salam Team! 👋</p>
-                <p>I am your Gemini AI Sponsorship Advisor calibrated for events in Pakistan (PKR). Ask me to draft corporate emails, outline budget requirements, or design tier packages!</p>
-              </div>
-            </div>
+        <div id="ai-output-container" class="hidden p-4 bg-slate-950 border border-slate-800 rounded-xl space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-bold text-indigo-400">AI Generated Draft</span>
+            <button onclick="copyAIPitch()" class="text-xs text-slate-400 hover:text-white"><i class="fa-regular fa-copy mr-1"></i> Copy</button>
           </div>
-
-          <div class="p-3 border-t border-slate-800 bg-slate-900/90 rounded-b-xl flex gap-2">
-            <textarea id="gemini-input" rows="2" placeholder="Ask Gemini to draft meeting invites or structure sponsorship packages in PKR..." class="flex-1 bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 resize-none"></textarea>
-            <button onclick="sendGeminiPrompt()" id="gemini-send-btn" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold text-xs transition flex items-center justify-center shrink-0">
-              <i class="fa-solid fa-paper-plane mr-1.5"></i> Ask
-            </button>
-          </div>
+          <p id="ai-output-text" class="text-xs text-slate-300 whitespace-pre-wrap leading-relaxed font-mono"></p>
         </div>
       </div>
     </div>
+
   </main>
 
-  <!-- MODALS SECTION -->
-
-  <!-- MODAL: Requirement -->
-  <div id="add-requirement-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="glass-card max-w-md w-full rounded-xl border border-slate-800 shadow-2xl p-6 space-y-4">
+  <!-- SETTINGS MODAL -->
+  <div id="settings-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass-card max-w-md w-full rounded-2xl p-6 space-y-5 border border-slate-800 shadow-2xl">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-list-check text-cyan-400"></i> Add Event Requirement
-        </h3>
-        <button onclick="closeModal('add-requirement-modal')" class="text-slate-400 hover:text-white transition">
-          <i class="fa-solid fa-xmark text-base"></i>
-        </button>
+        <h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-sliders text-indigo-400"></i> Campaign Settings & Goal</h3>
+        <button onclick="closeModal('settings-modal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
-      <form id="requirement-form" onsubmit="handleSaveRequirement(event)" class="space-y-3">
+      <form onsubmit="saveSettings(event)" class="space-y-4">
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Item Name *</label>
-          <input type="text" id="req-name" required placeholder="e.g., Auditorium Hall Rent, Refreshments" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Target Budget Goal (Rs.)</label>
+          <input type="number" id="settings-target" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
         </div>
 
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Currency Symbol</label>
+            <input type="text" id="settings-currency" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Days Remaining</label>
+            <input type="number" id="settings-days" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+          </div>
+        </div>
+
+        <!-- HARDCODED LOCKED FIREBASE BADGE -->
+        <div class="pt-2 border-t border-slate-800">
+          <div class="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg flex items-center gap-3">
+            <div class="w-8 h-8 rounded-md bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-cloud-check text-sm"></i>
+            </div>
+            <div>
+              <h4 class="text-xs font-bold text-emerald-300">Firebase Live Sync Active</h4>
+              <p class="text-[10px] text-slate-400 mt-0.5">Database pre-configured to <code class="bg-slate-950 px-1 py-0.5 rounded text-emerald-400 font-mono">sponsorship-tracker-4d736</code>. All updates sync automatically in real time.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('settings-modal')" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-xs font-semibold">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold">Save Settings</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADD REQUIREMENT MODAL -->
+  <div id="add-requirement-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass-card max-w-md w-full rounded-2xl p-6 space-y-4 border border-slate-800">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-plus text-cyan-400 mr-2"></i>Add Budget Requirement</h3>
+        <button onclick="closeModal('add-requirement-modal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form onsubmit="handleAddRequirement(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Item Title</label>
+          <input type="text" id="req-title" required placeholder="E.g., Refreshments for 200 Guests" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+        </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-slate-300 mb-1">Category</label>
-            <select id="req-category" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500"></select>
+            <select id="req-category" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+              <option>Venue & Stage</option>
+              <option>Food & Catering</option>
+              <option>Marketing & Printing</option>
+              <option>Media & Audio-Visual</option>
+              <option>Guest Shields & Gifts</option>
+              <option>Miscellaneous</option>
+            </select>
           </div>
-
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Sponsorship Type</label>
-            <select id="req-type" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
-              <option value="Cash">Cash Funding</option>
-              <option value="In-Kind">In-Kind / Product</option>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Type</label>
+            <select id="req-type" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+              <option>Cash Budget</option>
+              <option>In-Kind Sponsor</option>
             </select>
           </div>
         </div>
-
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Estimated Cost (Rs.) *</label>
-            <input type="number" id="req-cost" required min="0" step="500" placeholder="50000" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Estimated Cost (Rs.)</label>
+            <input type="number" id="req-cost" required placeholder="50000" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
           </div>
-
           <div>
             <label class="block text-xs font-semibold text-slate-300 mb-1">Status</label>
-            <select id="req-status" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
-              <option value="Needed">Needed (Unfunded)</option>
-              <option value="In Discussion">In Sponsor Discussion</option>
-              <option value="Secured">Secured 🏆</option>
+            <select id="req-status" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+              <option>Pending Sponsor</option>
+              <option>Pledged</option>
+              <option>Fully Covered 🏆</option>
             </select>
           </div>
         </div>
-
-        <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
-          <button type="button" onclick="closeModal('add-requirement-modal')" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs rounded-lg font-semibold hover:bg-slate-700 transition">Cancel</button>
-          <button type="submit" class="px-4 py-2 bg-cyan-600 text-white text-xs rounded-lg font-bold hover:bg-cyan-500 transition">Save Item</button>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('add-requirement-modal')" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-xs">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-cyan-600 text-white font-bold rounded-lg text-xs">Add Item</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- MODAL: Meeting -->
-  <div id="add-meeting-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="glass-card max-w-lg w-full rounded-xl border border-slate-800 shadow-2xl p-6 space-y-4">
+  <!-- ADD MEETING MODAL -->
+  <div id="add-meeting-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass-card max-w-md w-full rounded-2xl p-6 space-y-4 border border-slate-800">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-calendar-plus text-emerald-400"></i> Schedule Pitch Meeting
-        </h3>
-        <button onclick="closeModal('add-meeting-modal')" class="text-slate-400 hover:text-white transition">
-          <i class="fa-solid fa-xmark text-base"></i>
-        </button>
+        <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-calendar-plus text-emerald-400 mr-2"></i>Schedule Pitch Meeting</h3>
+        <button onclick="closeModal('add-meeting-modal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
       </div>
-
-      <form id="meeting-form" onsubmit="handleSaveMeeting(event)" class="space-y-3">
+      <form onsubmit="handleAddMeeting(event)" class="space-y-3">
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Sponsor / Company Name *</label>
-          <input type="text" id="meeting-company" required placeholder="e.g., Jazz, Systems Ltd, Nestle" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Company / Sponsor Name</label>
+          <input type="text" id="meet-company" required placeholder="E.g., Systems Limited" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
         </div>
-
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Date & Time *</label>
-            <input type="datetime-local" id="meeting-datetime" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Date & Time</label>
+            <input type="datetime-local" id="meet-datetime" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
           </div>
-
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Meeting Format</label>
-            <select id="meeting-format" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
-              <option value="Zoom / Google Meet">Zoom / Google Meet</option>
-              <option value="In-Person Office Meeting">In-Person Office Meeting</option>
-              <option value="Phone Call">Phone Call</option>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Status</label>
+            <select id="meet-status" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+              <option>Scheduled</option>
+              <option>Completed</option>
+
+              <option>Cancelled</option>
             </select>
           </div>
         </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Target Tier Pitch</label>
-            <select id="meeting-tier" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"></select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Assigned Lead</label>
-            <select id="meeting-owner" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"></select>
-          </div>
-        </div>
-
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Agenda Notes</label>
-          <textarea id="meeting-agenda" rows="2" placeholder="Present 10-slide deck, offer logo placement on main banner & opening speech slot." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-emerald-500 resize-none"></textarea>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Agenda / Meeting Notes</label>
+          <textarea id="meet-notes" rows="2" placeholder="Key points to pitch..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-emerald-500 resize-none"></textarea>
         </div>
-
-        <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
-          <button type="button" onclick="closeModal('add-meeting-modal')" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs rounded-lg font-semibold hover:bg-slate-700 transition">Cancel</button>
-          <button type="submit" class="px-4 py-2 bg-emerald-600 text-white text-xs rounded-lg font-bold hover:bg-emerald-500 transition">Schedule Meeting</button>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('add-meeting-modal')" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-xs">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-emerald-600 text-white font-bold rounded-lg text-xs">Save Meeting</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- MODAL: Lead Form -->
-  <div id="add-lead-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="glass-card max-w-lg w-full rounded-xl border border-slate-800 shadow-2xl p-6 space-y-4">
+  <!-- ADD LEAD MODAL -->
+  <div id="add-lead-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="glass-card max-w-md w-full rounded-2xl p-6 space-y-4 border border-slate-800">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="text-base font-bold text-white flex items-center gap-2" id="modal-lead-title">
-          <i class="fa-solid fa-building-circle-check text-indigo-400"></i> Add New Sponsor Prospect
-        </h3>
-        <button onclick="closeModal('add-lead-modal')" class="text-slate-400 hover:text-white transition">
-          <i class="fa-solid fa-xmark text-base"></i>
-        </button>
+        <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-plus text-indigo-400 mr-2"></i>Add Sponsor Prospect</h3>
+        <button onclick="closeModal('add-lead-modal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
       </div>
-
-      <form id="lead-form" onsubmit="handleSaveLead(event)" class="space-y-3">
-        <input type="hidden" id="lead-id">
-        
+      <form onsubmit="handleAddLead(event)" class="space-y-3">
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Company / Brand Name *</label>
-          <input type="text" id="lead-company" required placeholder="e.g., Jazz, Systems Ltd, Nestle" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Company Name</label>
+          <input type="text" id="lead-company" required placeholder="E.g., PepsiCo PK" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
         </div>
-
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Target Sponsorship Tier</label>
-            <select id="lead-tier" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"></select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Deal Value (Rs.) *</label>
-            <input type="number" id="lead-value" required min="0" step="5000" placeholder="100000" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Pipeline Stage</label>
-            <select id="lead-status" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
-              <option value="Prospect">Prospect</option>
-              <option value="Contacted">Contacted</option>
-              <option value="Pitch Sent">Pitch Sent</option>
-              <option value="Meeting Scheduled">Meeting Scheduled</option>
-              <option value="Closed-Won">Closed-Won 🏆</option>
-              <option value="Closed-Lost">Closed-Lost</option>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Target Tier</label>
+            <select id="lead-tier" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <option>Titanium</option>
+              <option>Gold</option>
+              <option>Silver</option>
+              <option>Beverage Partner</option>
+              <option>Media Partner</option>
             </select>
           </div>
-
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Assigned Member</label>
-            <select id="lead-owner" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"></select>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Deal Value (Rs.)</label>
+            <input type="number" id="lead-value" required placeholder="100000" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
           </div>
         </div>
-
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Contact Email / Phone</label>
-            <input type="text" id="lead-email" placeholder="contact@company.pk" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Stage</label>
+            <select id="lead-status" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <option>Prospect</option>
+              <option>Contacted</option>
+              <option>Pitch Sent</option>
+              <option>Meeting Scheduled</option>
+              <option>Closed-Won</option>
+              <option>Closed-Lost</option>
+            </select>
           </div>
-
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Follow-Up Date</label>
-            <input type="date" id="lead-followup" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Owner</label>
+            <input type="text" id="lead-owner" placeholder="Your Name" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
           </div>
         </div>
-
         <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Notes</label>
-          <textarea id="lead-notes" rows="2" placeholder="Sent sponsorship deck to marketing head." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-indigo-500 resize-none"></textarea>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Contact Email</label>
+          <input type="email" id="lead-email" placeholder="sponsor@company.com" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
         </div>
-
-        <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
-          <button type="button" onclick="closeModal('add-lead-modal')" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs rounded-lg font-semibold hover:bg-slate-700 transition">Cancel</button>
-          <button type="submit" class="px-4 py-2 bg-indigo-600 text-white text-xs rounded-lg font-bold hover:bg-indigo-500 transition">Save Prospect</button>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('add-lead-modal')" class="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-xs">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg text-xs">Save Lead</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- MODAL: Import CSV -->
-  <div id="import-csv-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="glass-card max-w-md w-full rounded-xl border border-slate-800 shadow-2xl p-6 space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-file-import text-emerald-400"></i> Import CSV Data
-        </h3>
-        <button onclick="closeModal('import-csv-modal')" class="text-slate-400 hover:text-white transition">
-          <i class="fa-solid fa-xmark text-base"></i>
-        </button>
-      </div>
-
-      <p class="text-xs text-slate-400">Paste CSV formatted text from Google Sheets to import leads.</p>
-
-      <textarea id="csv-paste-area" rows="6" placeholder="Company,Tier,Value,Status,Email,FollowUp,Owner,Notes&#10;Jazz,Title,200000,Contacted,info@jazz.com.pk,2026-10-10,Ali,Deck sent" class="w-full bg-slate-950 font-mono border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 resize-none"></textarea>
-
-      <div class="flex justify-end gap-2 border-t border-slate-800 pt-3">
-        <button onclick="closeModal('import-csv-modal')" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs rounded-lg font-semibold hover:bg-slate-700 transition">Cancel</button>
-        <button onclick="handleCSVImport()" class="px-4 py-2 bg-emerald-600 text-white text-xs rounded-lg font-bold hover:bg-emerald-500 transition">Import Leads</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: Email Generator -->
-  <div id="email-gen-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="glass-card max-w-lg w-full rounded-xl border border-slate-800 shadow-2xl p-6 space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <i class="fa-regular fa-paper-plane text-emerald-400"></i> Pitch Meeting Invite Template
-        </h3>
-        <button onclick="closeModal('email-gen-modal')" class="text-slate-400 hover:text-white transition">
-          <i class="fa-solid fa-xmark text-base"></i>
-        </button>
-      </div>
-
-      <div class="space-y-3">
-        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-slate-300 leading-relaxed space-y-2 select-all relative" id="email-template-text">
-          <p class="text-indigo-400 font-bold">Subject: Strategic Sponsorship Opportunity: [Society/Event Name] x [Sponsor Brand]</p>
-          <p>Respected [Contact Name / Team],</p>
-          <p>I hope this email finds you well.</p>
-          <p>I am reaching out on behalf of [Your Society Name]. We are hosting [Event Name], expected to bring together over [Target Audience, e.g. 800+] university students and young professionals across Pakistan.</p>
-          <p>Given [Sponsor Brand]'s industry leadership, we would love to feature you as an official partner. We offer direct stall activations, banner placements, and digital coverage.</p>
-          <p>Would you be open to a quick 10-minute pitch meeting or call this week to discuss details?</p>
-          <p>Best regards,<br>[Your Name]<br>Sponsorship Lead, [Your Society Name]</p>
-        </div>
-      </div>
-
-      <div class="flex justify-end gap-2 border-t border-slate-800 pt-3">
-        <button onclick="closeModal('email-gen-modal')" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs rounded-lg font-semibold hover:bg-slate-700 transition">Close</button>
-        <button onclick="copyMeetingEmailTemplate()" class="px-4 py-2 bg-indigo-600 text-white text-xs rounded-lg font-bold hover:bg-indigo-500 transition shadow-lg shadow-indigo-600/30 flex items-center gap-1.5">
-          <i class="fa-regular fa-copy"></i> Copy Email
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: Settings -->
-  <div id="settings-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="glass-card max-w-md w-full rounded-xl border border-slate-800 shadow-2xl p-6 space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-sliders text-indigo-400"></i> Drive & Database Settings
-        </h3>
-        <button onclick="closeModal('settings-modal')" class="text-slate-400 hover:text-white transition">
-          <i class="fa-solid fa-xmark text-base"></i>
-        </button>
-      </div>
-
-      <div class="space-y-3">
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Target Financial Goal (Rs.)</label>
-          <input type="number" id="settings-target" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Currency Symbol</label>
-          <input type="text" id="settings-currency" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Days Remaining</label>
-          <input type="number" id="settings-days" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
-        </div>
-        
-        <div id="list-managers" class="space-y-4 pt-3 border-t border-slate-800"></div>
-
-        <div class="pt-2 border-t border-slate-800">
-          <label class="block text-xs font-semibold text-indigo-300 mb-1"><i class="fa-solid fa-fire mr-1"></i> Optional Firebase Config JSON (Live Team Sync)</label>
-          <textarea id="settings-firebase-config" rows="3" placeholder='{"apiKey":"...","authDomain":"...","projectId":"..."}' class="w-full bg-slate-950 font-mono border border-slate-800 rounded-lg p-2 text-[10px] text-slate-300 focus:outline-none focus:border-indigo-500 resize-none"></textarea>
-          <p class="text-[10px] text-slate-500 mt-1">Paste your Firebase web config to connect live real-time DB across all team members.</p>
-        </div>
-      </div>
-
-      <div class="flex justify-end gap-2 border-t border-slate-800 pt-3">
-        <button onclick="closeModal('settings-modal')" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs rounded-lg font-semibold hover:bg-slate-700 transition">Cancel</button>
-        <button onclick="saveSettings()" class="px-4 py-2 bg-indigo-600 text-white text-xs rounded-lg font-bold hover:bg-indigo-500 transition">Save Settings</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: Complete Note -->
-  <div id="complete-note-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="glass-card max-w-md w-full rounded-xl border border-slate-800 shadow-2xl p-6 space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="text-base font-bold text-white flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-400"></i> Mark as Completed</h3>
-        <button type="button" onclick="closeModal('complete-note-modal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-base"></i></button>
-      </div>
-      <p id="complete-note-text" class="text-xs text-slate-300 bg-slate-950 border border-slate-800 rounded-lg p-3 break-words"></p>
-      <form onsubmit="submitComplete(event)" class="space-y-3">
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Your Name *</label>
-          <input id="complete-name" list="team-datalist" required maxlength="40" autocomplete="off" placeholder="Type or pick your name" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
-          <datalist id="team-datalist"></datalist>
-        </div>
-        <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
-          <button type="button" onclick="closeModal('complete-note-modal')" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs rounded-lg font-semibold hover:bg-slate-700 transition">Cancel</button>
-          <button type="submit" class="px-4 py-2 bg-emerald-600 text-white text-xs rounded-lg font-bold hover:bg-emerald-500 transition">Mark Completed</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- MODAL: Quick Add -->
-  <div id="quick-add-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="glass-card max-w-sm w-full rounded-xl border border-slate-800 shadow-2xl p-6 space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 id="quick-title" class="text-base font-bold text-white">Add</h3>
-        <button type="button" onclick="closeModal('quick-add-modal')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-base"></i></button>
-      </div>
-      <form onsubmit="submitQuick(event)" class="space-y-3">
-        <input id="quick-name" required maxlength="50" autocomplete="off" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
-        <div id="quick-value-wrap" class="hidden">
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Typical Deal Value (Rs.)</label>
-          <input id="quick-value" type="number" min="0" step="5000" placeholder="150000" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
-        </div>
-        <div class="flex justify-end gap-2 pt-2 border-t border-slate-800">
-          <button type="button" onclick="closeModal('quick-add-modal')" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs rounded-lg font-semibold hover:bg-slate-700 transition">Cancel</button>
-          <button type="submit" class="px-4 py-2 bg-indigo-600 text-white text-xs rounded-lg font-bold hover:bg-indigo-500 transition">Add</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Notification Toast Container -->
-  <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
-
-  <!-- APPLICATION CORE SCRIPT -->
+  <!-- APPLICATION SCRIPT LOGIC -->
   <script>
-    // Global State Container
-    window.appState = {
-      activeTab: 'kickstart',
-      currencySymbol: 'Rs. ',
+    // Global State
+    let appState = {
       targetGoal: 500000,
+      currencySymbol: 'Rs. ',
       daysRemaining: 30,
-      viewMode: 'table',
-      leads: [],
       requirements: [],
-      meetings: [],
-      weeklyPlan: [],
       notes: [],
-      team: [],
-      tiers: [],
-      categories: [],
-      lastName: '',
-      firebaseConfig: null
+      meetings: [],
+      leads: [],
+      weeklyTasks: [
+        { id: 1, week: 1, title: 'Finalize Event Expense Budget', done: true },
+        { id: 2, week: 1, title: 'Draft Sponsorship Proposal Deck', done: false },
+        { id: 3, week: 2, title: 'Outreach to 20 Local Brands', done: false },
+        { id: 4, week: 3, title: 'Conduct Decision Pitch Meetings', done: false },
+        { id: 5, week: 4, title: 'Collect Cheques & Final MOUs', done: false }
+      ]
     };
 
-    const defaultRequirements = [
-      { id: 'req_1', name: 'Auditorium Hall & Stage Rental', category: 'Venue & Stage', type: 'Cash', cost: 120000, status: 'Needed' },
-      { id: 'req_2', name: 'Event Refreshments & Hi-Tea (500 pax)', category: 'Food & Catering', type: 'In-Kind', cost: 150000, status: 'In Discussion' },
-      { id: 'req_3', name: 'Sound System & Lights Setup', category: 'Sound & AV Tech', type: 'Cash', cost: 80000, status: 'Needed' },
-      { id: 'req_4', name: 'Printed Standees, Banners & Badges', category: 'Printing & Marketing', type: 'Cash', cost: 50000, status: 'Needed' },
-      { id: 'req_5', name: 'Winner Cash Prizes & Shields', category: 'Prizes & Shields', type: 'Cash', cost: 100000, status: 'Secured' }
-    ];
+    // Initialize Realtime DB reference
+    let db = null;
 
-    const defaultMeetings = [
-      { id: 'm_1', company: 'Jazz', datetime: '2026-10-06T14:30', format: 'Zoom / Google Meet', tier: 'Title Sponsor', owner: 'Ali (Lead)', agenda: 'Pitch title sponsorship deck and booth rights.' },
-      { id: 'm_2', company: 'Systems Ltd', datetime: '2026-10-08T11:00', format: 'In-Person Office Meeting', tier: 'Gold Sponsor', owner: 'Sara (Finance)', agenda: 'Discuss recruitment stall and tech workshop slot.' }
-    ];
-
-    const defaultLeads = [
-      { id: '1', company: 'Jazz', tier: 'Title Sponsor', value: 200000, status: 'Meeting Scheduled', email: 'sponsorships@jazz.com.pk', followup: '2026-10-06', owner: 'Ali (Lead)', notes: 'Meeting confirmed to present proposal deck.' },
-      { id: '2', company: 'Systems Ltd', tier: 'Gold Sponsor', value: 100000, status: 'Meeting Scheduled', email: 'careers@systemsltd.com', followup: '2026-10-08', owner: 'Sara (Finance)', notes: 'In-person pitch meeting set.' },
-      { id: '3', company: 'Nestle Pakistan', tier: 'In-Kind Partner', value: 50000, status: 'Pitch Sent', email: 'brand@nestle.pk', followup: '2026-10-09', owner: 'You', notes: 'Sent customized beverage sponsorship offer.' }
-    ];
-
-    const defaultWeeklyPlan = [
-      {
-        weekNum: 1,
-        title: "Week 1: Budget, Pitch Deck & Lead List",
-        tasks: [
-          { id: 'w1t1', text: "Calculate event budget in PKR and list items", completed: true },
-          { id: 'w1t2', text: "Finalize Pitch Deck and Sponsor Tier Packages", completed: false },
-          { id: 'w1t3', text: "Compile target list of 15+ corporate brands in PK", completed: false }
-        ]
-      },
-      {
-        weekNum: 2,
-        title: "Week 2: Direct Outreach & Pitch Invites",
-        tasks: [
-          { id: 'w2t1', text: "Send cold pitch emails & LinkedIn requests", completed: false },
-          { id: 'w2t2', text: "Schedule 5+ pitch meetings with decision-makers", completed: false }
-        ]
-      },
-      {
-        weekNum: 3,
-        title: "Week 3: Meetings & Contract Negotiation",
-        tasks: [
-          { id: 'w3t1', text: "Conduct pitch meetings & customize perk packages", completed: false },
-          { id: 'w3t2', text: "Draft formal agreement contracts", completed: false }
-        ]
-      },
-      {
-        weekNum: 4,
-        title: "Week 4: Signings & Bank Transfers",
-        tasks: [
-          { id: 'w4t1', text: "Collect signed sponsorship contracts", completed: false },
-          { id: 'w4t2', text: "Verify bank wire transfers & product deliveries", completed: false }
-        ]
+    function initFirebaseSync() {
+      try {
+        if (typeof firebase !== 'undefined' && firebase.apps.length) {
+          db = firebase.database();
+          
+          // Listen for live updates
+          db.ref('appData').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+              appState = { ...appState, ...data };
+              renderAll();
+            }
+          });
+        }
+      } catch (err) {
+        console.warn("Realtime Sync Fallback to LocalStorage:", err);
       }
-    ];
+    }
 
-    /* ===== Helpers ===== */
-    const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-    const clone = o => JSON.parse(JSON.stringify(o));
-    const S = () => window.appState;
-    const defaultTeam = ['You', 'Ali (Lead)', 'Sara (Finance)'];
-    const defaultTiers = [
-      { name: 'Title Sponsor', value: 200000 },
-      { name: 'Gold Sponsor', value: 100000 },
-      { name: 'Silver Sponsor', value: 50000 },
-      { name: 'Bronze Sponsor', value: 25000 },
-      { name: 'In-Kind Partner', value: 50000 }
-    ];
-    const defaultCats = ['Venue & Stage', 'Food & Catering', 'Sound & AV Tech', 'Printing & Marketing', 'Prizes & Shields', 'Miscellaneous'];
-    const defaultNotes = [{ id: 'n_1', text: 'Confirm auditorium booking letter with the department head', kind: 'Requirement', priority: 'High', created: Date.now(), done: false }];
-    const tierValue = n => { const t = S().tiers.find(x => x.name === n); return t ? t.value : 50000; };
+    function saveData() {
+      // 1. LocalStorage Backup
+      localStorage.setItem('sponsorpulse_data', JSON.stringify(appState));
+      
+      // 2. Sync to Firebase Realtime DB
+      if (db) {
+        db.ref('appData').set(appState);
+      }
+    }
 
-    // Initialization
-    window.onload = function() {
-      loadLocalStorage();
+    function loadInitialData() {
+      const saved = localStorage.getItem('sponsorpulse_data');
+      if (saved) {
+        try {
+          appState = { ...appState, ...JSON.parse(saved) };
+        } catch (e) {
+          console.error("Local data load error", e);
+        }
+      }
+      initFirebaseSync();
       renderAll();
-    };
-
-    function resetToDefaults() {
-      window.appState.requirements = clone(defaultRequirements);
-      window.appState.meetings = clone(defaultMeetings);
-      window.appState.leads = clone(defaultLeads);
-      window.appState.weeklyPlan = clone(defaultWeeklyPlan);
-      window.appState.notes = clone(defaultNotes);
-      window.appState.team = [...defaultTeam];
-      window.appState.tiers = clone(defaultTiers);
-      window.appState.categories = [...defaultCats];
-      saveToLocalStorage();
     }
 
-    // UI Rendering Functions
-    window.renderAll = function() {
-      renderStats();
-      renderRequirementsTable();
-      renderMeetingsList();
-      renderLeadsTable();
-      renderWeeklyPlan();
-      fillSelects();
-      renderNotes();
-    };
-
-    function renderStats() {
-      const sym = window.appState.currencySymbol || 'Rs. ';
-      const reqs = window.appState.requirements || [];
-      const totalReqBudget = reqs.reduce((sum, r) => sum + Number(r.cost || 0), 0);
-      
-      const goal = totalReqBudget > 0 ? totalReqBudget : window.appState.targetGoal;
-
-      const leads = window.appState.leads || [];
-      const confirmedValue = leads.filter(l => l.status === 'Closed-Won').reduce((acc, l) => acc + Number(l.value || 0), 0);
-      const pipelineValue = leads.filter(l => l.status !== 'Closed-Lost').reduce((acc, l) => acc + Number(l.value || 0), 0);
-      const activeCount = leads.filter(l => l.status !== 'Closed-Won' && l.status !== 'Closed-Lost').length;
-      const percentage = goal > 0 ? Math.min(100, Math.round((confirmedValue / goal) * 100)) : 0;
-
-      const meetings = window.appState.meetings || [];
-
-      document.getElementById('stat-target-value').innerText = `${sym}${goal.toLocaleString()}`;
-      document.getElementById('stat-req-count').innerText = `From ${reqs.length} requirement items`;
-      document.getElementById('stat-raised-value').innerText = `${sym}${confirmedValue.toLocaleString()}`;
-      document.getElementById('stat-raised-percent').innerText = `(${percentage}%)`;
-      document.getElementById('stat-progress-bar').style.width = `${percentage}%`;
-      document.getElementById('stat-pipeline-value').innerText = `${sym}${pipelineValue.toLocaleString()}`;
-      document.getElementById('stat-active-leads-count').innerText = activeCount;
-      
-      document.getElementById('stat-meetings-count').innerText = meetings.length;
-      document.getElementById('stat-upcoming-meetings').innerText = meetings.filter(m => new Date(m.datetime) >= new Date()).length;
-
-      document.getElementById('header-countdown').innerText = `${window.appState.daysRemaining || 30} Days Left`;
+    // Modal Control
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
     }
 
-    function renderRequirementsTable() {
-      const reqs = window.appState.requirements || [];
-      const tbody = document.getElementById('requirements-table-body');
-      const sym = window.appState.currencySymbol || 'Rs. ';
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
 
-      let cashTotal = 0, inkindTotal = 0, gapTotal = 0;
-      tbody.innerHTML = '';
+    function openSettings() {
+      document.getElementById('settings-target').value = appState.targetGoal || 500000;
+      document.getElementById('settings-currency').value = appState.currencySymbol || 'Rs. ';
+      document.getElementById('settings-days').value = appState.daysRemaining || 30;
+      openModal('settings-modal');
+    }
 
-      if (reqs.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-500 text-xs">No event requirements added yet.</td></tr>`;
-      } else {
-        reqs.forEach((r, idx) => {
-          const val = Number(r.cost || 0);
-          if (r.type === 'Cash') cashTotal += val; else inkindTotal += val;
-          if (r.status !== 'Secured') gapTotal += val;
+    function saveSettings(e) {
+      if (e) e.preventDefault();
+      appState.targetGoal = parseFloat(document.getElementById('settings-target').value) || 500000;
+      appState.currencySymbol = document.getElementById('settings-currency').value || 'Rs. ';
+      appState.daysRemaining = parseInt(document.getElementById('settings-days').value) || 30;
+      
+      saveData();
+      closeModal('settings-modal');
+      renderAll();
+    }
 
-          let statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">Needed</span>`;
-          if (r.status === 'In Discussion') statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">In Discussion</span>`;
-          if (r.status === 'Secured') statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Secured 🏆</span>`;
+    // Tab Switching
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(el => {
+        el.classList.remove('bg-indigo-600', 'text-white');
+        el.classList.add('text-slate-400');
+      });
 
-          const tr = document.createElement('tr');
-          tr.className = "hover:bg-slate-900/60 transition border-b border-slate-800/40";
-          tr.innerHTML = `
-            <td class="px-4 py-3 font-bold text-white flex items-center gap-2">
-              <i class="fa-solid fa-box text-cyan-400"></i> ${esc(r.name)}
-            </td>
-            <td class="px-4 py-3 text-slate-400"><span class="px-2 py-0.5 bg-slate-800 rounded border border-slate-700/60">${esc(r.category)}</span></td>
-            <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[11px] font-semibold ${r.type === 'Cash' ? 'bg-indigo-500/10 text-indigo-300' : 'bg-amber-500/10 text-amber-300'}">${esc(r.type)}</span></td>
-            <td class="px-4 py-3 font-bold text-emerald-400">${sym}${val.toLocaleString()}</td>
-            <td class="px-4 py-3"><button onclick="cycleReqStatus(${idx})" title="Click to change status" class="hover:opacity-80">${statusBadge}</button></td>
-            <td class="px-4 py-3 text-right">
-              <button onclick="deleteRequirement(${idx})" class="p-1.5 text-slate-400 hover:text-rose-400 transition" title="Delete">
-                <i class="fa-solid fa-trash-can"></i>
-              </button>
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
+      const activeView = document.getElementById('view-' + tabId);
+      const activeTabBtn = document.getElementById('tab-' + tabId);
+
+      if (activeView) activeView.classList.remove('hidden');
+      if (activeTabBtn) {
+        activeTabBtn.classList.add('bg-indigo-600', 'text-white');
+        activeTabBtn.classList.remove('text-slate-400');
       }
-
-      document.getElementById('req-cash-total').innerText = `${sym}${cashTotal.toLocaleString()}`;
-      document.getElementById('req-inkind-total').innerText = `${sym}${inkindTotal.toLocaleString()}`;
-      document.getElementById('req-gap-total').innerText = `${sym}${gapTotal.toLocaleString()}`;
     }
 
-    function handleSaveRequirement(e) {
+    // Requirements Logic
+    function handleAddRequirement(e) {
       e.preventDefault();
-      const name = document.getElementById('req-name').value.trim();
+      const title = document.getElementById('req-title').value;
       const category = document.getElementById('req-category').value;
       const type = document.getElementById('req-type').value;
       const cost = parseFloat(document.getElementById('req-cost').value) || 0;
       const status = document.getElementById('req-status').value;
 
-      window.appState.requirements.push({ id: 'req_' + Date.now(), name, category, type, cost, status });
+      appState.requirements.push({ id: Date.now(), title, category, type, cost, status });
+      saveData();
       closeModal('add-requirement-modal');
-      saveToLocalStorage();
-      renderAll();
-      showToast('Added event requirement', 'success');
+      renderRequirements();
+      e.target.reset();
     }
 
-    function deleteRequirement(index) {
-      window.appState.requirements.splice(index, 1);
-      saveToLocalStorage();
-      renderAll();
-      showToast('Requirement removed', 'info');
+    function deleteRequirement(id) {
+      appState.requirements = appState.requirements.filter(item => item.id !== id);
+      saveData();
+      renderRequirements();
     }
 
     function applyDefaultRequirementsTemplate() {
-      window.appState.requirements = clone(defaultRequirements);
-      saveToLocalStorage();
-      renderAll();
-      showToast('Loaded standard PKR budget template!', 'success');
-      switchTab('requirements');
+      appState.requirements = [
+        { id: 1, title: 'Auditorium Booking Waiver', category: 'Venue & Stage', type: 'In-Kind Sponsor', cost: 120000, status: 'Fully Covered 🏆' },
+        { id: 2, title: 'Hi-Tea & Refreshments for Guests', category: 'Food & Catering', type: 'In-Kind Sponsor', cost: 80000, status: 'Pending Sponsor' },
+        { id: 3, title: 'Flex Banners & Printing Material', category: 'Marketing & Printing', type: 'Cash Budget', cost: 35000, status: 'Pledged' },
+        { id: 4, title: 'Media Coverage & Sound System', category: 'Media & Audio-Visual', type: 'Cash Budget', cost: 65000, status: 'Pending Sponsor' }
+      ];
+      saveData();
+      renderRequirements();
     }
 
-    function renderMeetingsList() {
-      const container = document.getElementById('meetings-list-container');
-      const meetings = window.appState.meetings || [];
-      container.innerHTML = '';
-
-      if (meetings.length === 0) {
-        container.innerHTML = `
-          <div class="col-span-full glass-card p-8 rounded-xl text-center space-y-3">
-            <i class="fa-solid fa-calendar-xmark text-3xl text-slate-600"></i>
-            <h4 class="text-sm font-bold text-slate-300">No pitch meetings scheduled yet</h4>
-            <button onclick="openModal('add-meeting-modal')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg transition shadow-lg shadow-emerald-600/20">
-              Schedule First Pitch Meeting
-            </button>
-          </div>`;
-      } else {
-        meetings.forEach((m, idx) => {
-          const card = document.createElement('div');
-          card.className = "glass-card p-4 rounded-xl border border-slate-800 space-y-3 relative overflow-hidden flex flex-col justify-between";
-          
-          const dt = new Date(m.datetime);
-          const dateStr = isNaN(dt.getTime()) ? m.datetime : dt.toLocaleDateString('en-PK', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-
-          card.innerHTML = `
-            <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 text-[10px] font-bold uppercase">${esc(m.format)}</span>
-                <span class="text-[11px] text-slate-400 font-medium">${esc(m.owner)}</span>
-              </div>
-
-              <h3 class="text-sm font-bold text-white flex items-center justify-between">
-                <span>${esc(m.company)}</span>
-                <span class="text-xs text-indigo-400 font-semibold">${esc(m.tier)}</span>
-              </h3>
-
-              <div class="text-xs text-amber-300 flex items-center gap-1.5 pt-1">
-                <i class="fa-regular fa-clock"></i>
-                <span class="font-semibold">${dateStr}</span>
-              </div>
-
-              ${m.agenda ? `<p class="text-[11px] text-slate-400 pt-1 border-t border-slate-800/80 leading-snug">${esc(m.agenda)}</p>` : ''}
-            </div>
-
-            <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between">
-              <button onclick="convertToClosedWon('${m.id}')" class="text-[11px] font-bold text-emerald-400 hover:text-emerald-300 transition flex items-center gap-1">
-                <i class="fa-solid fa-circle-check"></i> Move to Closed-Won
-              </button>
-              <button onclick="deleteMeeting(${idx})" class="text-slate-500 hover:text-rose-400 text-xs p-1">
-                <i class="fa-solid fa-trash-can"></i>
-              </button>
-            </div>
-          `;
-          container.appendChild(card);
-        });
-      }
-    }
-
-    function handleSaveMeeting(e) {
-      e.preventDefault();
-      const company = document.getElementById('meeting-company').value.trim();
-      const datetime = document.getElementById('meeting-datetime').value;
-      const format = document.getElementById('meeting-format').value;
-      const tier = document.getElementById('meeting-tier').value;
-      const owner = document.getElementById('meeting-owner').value;
-      const agenda = document.getElementById('meeting-agenda').value.trim();
-
-      window.appState.meetings.push({ id: 'm_' + Date.now(), company, datetime, format, tier, owner, agenda });
-
-      const existingIdx = window.appState.leads.findIndex(l => l.company.toLowerCase() === company.toLowerCase());
-      if (existingIdx !== -1) {
-        if (window.appState.leads[existingIdx].status !== 'Closed-Won') window.appState.leads[existingIdx].status = 'Meeting Scheduled';
-      } else {
-        window.appState.leads.unshift({
-          id: 'lead_' + Date.now(),
-          company,
-          tier,
-          value: tierValue(tier),
-          status: 'Meeting Scheduled',
-          email: '',
-          followup: datetime.slice(0, 10),
-          owner,
-          notes: agenda || 'Pitch meeting scheduled.'
-        });
-      }
-
-      closeModal('add-meeting-modal');
-      saveToLocalStorage();
-      renderAll();
-      showToast('Meeting scheduled & added to pipeline!', 'success');
-      triggerConfetti();
-    }
-
-    function deleteMeeting(idx) {
-      window.appState.meetings.splice(idx, 1);
-      saveToLocalStorage();
-      renderAll();
-      showToast('Meeting removed', 'info');
-    }
-
-    function renderLeadsTable() {
-      const search = (document.getElementById('lead-search').value || '').toLowerCase();
-      const statusFilter = document.getElementById('lead-status-filter').value;
-      const sym = window.appState.currencySymbol || 'Rs. ';
-
-      const filtered = (window.appState.leads || []).filter(l => {
-        const matchesSearch = l.company.toLowerCase().includes(search) || (l.owner && l.owner.toLowerCase().includes(search));
-        const matchesStatus = statusFilter === 'ALL' || l.status === statusFilter;
-        return matchesSearch && matchesStatus;
-      });
-
-      const tbody = document.getElementById('leads-table-body');
+    function renderRequirements() {
+      const tbody = document.getElementById('requirements-table-body');
       tbody.innerHTML = '';
 
-      if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-500 text-xs">No sponsor prospects found.</td></tr>`;
-      } else {
-        filtered.forEach(lead => {
-          const tr = document.createElement('tr');
-          tr.className = "hover:bg-slate-900/60 transition group border-b border-slate-800/40";
-          tr.innerHTML = `
-            <td class="px-4 py-3 font-bold text-white flex items-center gap-2">
-              <div class="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-black text-indigo-400 shrink-0">
-                ${esc(lead.company.charAt(0).toUpperCase())}
-              </div>
-              <div>
-                <div>${esc(lead.company)}</div>
-                ${lead.notes ? `<p class="text-[10px] text-slate-400 font-normal truncate max-w-xs">${esc(lead.notes)}</p>` : ''}
-              </div>
-            </td>
-            <td class="px-4 py-3 text-slate-300"><span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-[11px]">${esc(lead.tier)}</span></td>
-            <td class="px-4 py-3 font-bold text-emerald-400">${sym}${Number(lead.value).toLocaleString()}</td>
-            <td class="px-4 py-3">${getStatusBadge(lead.status)}</td>
-            <td class="px-4 py-3 text-slate-400 font-mono text-[11px]">${esc(lead.email || '-')}</td>
-            <td class="px-4 py-3 text-slate-300 text-[11px]">${esc(lead.followup || 'Not set')}</td>
-            <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 text-[11px]">${esc(lead.owner || 'Unassigned')}</span></td>
-            <td class="px-4 py-3 text-right space-x-1">
-              <button onclick="editLead('${lead.id}')" class="p-1.5 text-slate-400 hover:text-indigo-400 transition"><i class="fa-solid fa-pen-to-square"></i></button>
-              <button onclick="deleteLead('${lead.id}')" class="p-1.5 text-slate-400 hover:text-rose-400 transition"><i class="fa-solid fa-trash-can"></i></button>
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }
+      let cashTotal = 0;
+      let inkindTotal = 0;
+      let gapTotal = 0;
 
-      renderKanbanView(filtered);
-    }
+      appState.requirements.forEach(item => {
+        if (item.type === 'Cash Budget') cashTotal += item.cost;
+        else inkindTotal += item.cost;
 
-    function getStatusBadge(status) {
-      switch (status) {
-        case 'Closed-Won': return `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Closed-Won 🏆</span>`;
-        case 'Closed-Lost': return `<span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">Closed-Lost</span>`;
-        case 'Meeting Scheduled': return `<span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">Meeting Scheduled</span>`;
-        case 'Pitch Sent': return `<span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Pitch Sent</span>`;
-        case 'Contacted': return `<span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/20">Contacted</span>`;
-        default: return `<span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-slate-800 text-slate-400 border border-slate-700">Prospect</span>`;
-      }
-    }
+        if (item.status !== 'Fully Covered 🏆') gapTotal += item.cost;
 
-    function renderKanbanView(leads) {
-      const stages = ['Prospect', 'Contacted', 'Pitch Sent', 'Meeting Scheduled', 'Closed-Won', 'Closed-Lost'];
-      const container = document.getElementById('kanban-view-container');
-      container.innerHTML = '';
-      const sym = window.appState.currencySymbol || 'Rs. ';
-
-      stages.forEach(stage => {
-        const stageLeads = leads.filter(l => l.status === stage);
-        const stageValue = stageLeads.reduce((acc, l) => acc + Number(l.value || 0), 0);
-
-        const col = document.createElement('div');
-        col.className = "bg-slate-900/80 rounded-xl p-3 border border-slate-800 flex flex-col space-y-3 min-h-[380px]";
-        col.innerHTML = `
-          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-            <h4 class="text-xs font-bold text-slate-200 uppercase tracking-wider">${stage} (${stageLeads.length})</h4>
-            <span class="text-xs font-bold text-emerald-400">${sym}${stageValue.toLocaleString()}</span>
-          </div>
-          <div class="space-y-2 flex-1 overflow-y-auto">
-            ${stageLeads.map(l => `
-              <div class="bg-slate-950 p-3 rounded-lg border border-slate-800/80 hover:border-indigo-500/50 transition cursor-pointer shadow-md space-y-2" onclick="editLead('${l.id}')">
-                <div class="flex justify-between items-start">
-                  <h5 class="text-xs font-bold text-white">${esc(l.company)}</h5>
-                  <span class="text-[11px] font-bold text-emerald-400">${sym}${Number(l.value).toLocaleString()}</span>
-                </div>
-                <div class="text-[10px] text-slate-400 flex justify-between items-center">
-                  <span class="bg-slate-800 px-1.5 py-0.5 rounded text-slate-300">${esc(l.tier)}</span>
-                  <span>${esc(l.owner || 'Unassigned')}</span>
-                </div>
-              </div>
-            `).join('')}
-          </div>
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-900/50';
+        tr.innerHTML = `
+          <td class="px-4 py-3 font-semibold text-white">${item.title}</td>
+          <td class="px-4 py-3 text-slate-400">${item.category}</td>
+          <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${item.type === 'Cash Budget' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-amber-500/20 text-amber-300'}">${item.type}</span></td>
+          <td class="px-4 py-3 font-bold">${appState.currencySymbol}${item.cost.toLocaleString()}</td>
+          <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${item.status === 'Fully Covered 🏆' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-300'}">${item.status}</span></td>
+          <td class="px-4 py-3 text-right">
+            <button onclick="deleteRequirement(${item.id})" class="text-slate-500 hover:text-rose-400"><i class="fa-solid fa-trash"></i></button>
+          </td>
         `;
-        container.appendChild(col);
+        tbody.appendChild(tr);
       });
+
+      document.getElementById('req-cash-total').innerText = appState.currencySymbol + cashTotal.toLocaleString();
+      document.getElementById('req-inkind-total').innerText = appState.currencySymbol + inkindTotal.toLocaleString();
+      document.getElementById('req-gap-total').innerText = appState.currencySymbol + gapTotal.toLocaleString();
+      document.getElementById('stat-req-count').innerText = `From ${appState.requirements.length} requirement items`;
     }
 
-    function toggleViewMode() {
-      const tableView = document.getElementById('table-view-container');
-      const kanbanView = document.getElementById('kanban-view-container');
-      const modeText = document.getElementById('view-mode-text');
+    // Notes Logic
+    function handleAddNote(e) {
+      e.preventDefault();
+      const text = document.getElementById('note-text').value;
+      const kind = document.getElementById('note-kind').value;
+      const priority = document.getElementById('note-priority').value;
 
-      if (window.appState.viewMode === 'table') {
-        window.appState.viewMode = 'kanban';
-        tableView.classList.add('hidden');
-        kanbanView.classList.remove('hidden');
-        modeText.innerText = 'Table View';
-      } else {
-        window.appState.viewMode = 'table';
-        kanbanView.classList.add('hidden');
-        tableView.classList.remove('hidden');
-        modeText.innerText = 'Kanban View';
+      appState.notes.push({ id: Date.now(), text, kind, priority, done: false });
+      saveData();
+      document.getElementById('note-text').value = '';
+      renderNotes();
+    }
+
+    function toggleNote(id) {
+      const note = appState.notes.find(n => n.id === id);
+      if (note) {
+        note.done = !note.done;
+        saveData();
+        renderNotes();
       }
     }
 
-    function handleSaveLead(e) {
+    function clearCompletedNotes() {
+      appState.notes = appState.notes.filter(n => !n.done);
+      saveData();
+      renderNotes();
+    }
+
+    function renderNotes() {
+      const pendingList = document.getElementById('notes-pending-list');
+      const doneList = document.getElementById('notes-done-list');
+      pendingList.innerHTML = '';
+      doneList.innerHTML = '';
+
+      let pendingCount = 0;
+      let doneCount = 0;
+
+      appState.notes.forEach(note => {
+        const div = document.createElement('div');
+        div.className = 'p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between gap-3';
+        div.innerHTML = `
+          <div class="flex items-center gap-3">
+            <button onclick="toggleNote(${note.id})" class="text-slate-500 hover:text-emerald-400">
+              <i class="fa-${note.done ? 'solid fa-circle-check text-emerald-400' : 'regular fa-circle'} text-base"></i>
+            </button>
+            <span class="text-xs ${note.done ? 'line-through text-slate-500' : 'text-slate-200'}">${note.text}</span>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-semibold">${note.priority}</span>
+        `;
+
+        if (note.done) {
+          doneList.appendChild(div);
+          doneCount++;
+        } else {
+          pendingList.appendChild(div);
+          pendingCount++;
+        }
+      });
+
+      document.getElementById('notes-pending-count').innerText = pendingCount;
+      document.getElementById('notes-done-count').innerText = doneCount;
+      
+      const badge = document.getElementById('notes-badge');
+      if (pendingCount > 0) {
+        badge.innerText = pendingCount;
+        badge.classList.remove('hidden');
+        badge.classList.add('inline-flex');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+
+    // Meetings Logic
+    function handleAddMeeting(e) {
       e.preventDefault();
-      const id = document.getElementById('lead-id').value;
-      const company = document.getElementById('lead-company').value.trim();
+      const company = document.getElementById('meet-company').value;
+      const datetime = document.getElementById('meet-datetime').value;
+      const status = document.getElementById('meet-status').value;
+      const notes = document.getElementById('meet-notes').value;
+
+      appState.meetings.push({ id: Date.now(), company, datetime, status, notes });
+      saveData();
+      closeModal('add-meeting-modal');
+      renderMeetings();
+      e.target.reset();
+    }
+
+    function renderMeetings() {
+      const container = document.getElementById('meetings-list-container');
+      container.innerHTML = '';
+
+      let upcoming = 0;
+
+      appState.meetings.forEach(m => {
+        if (m.status === 'Scheduled') upcoming++;
+        const card = document.createElement('div');
+        card.className = 'glass-card p-4 rounded-xl border border-slate-800 space-y-3';
+        card.innerHTML = `
+          <div class="flex justify-between items-start">
+            <h4 class="font-bold text-white text-sm">${m.company}</h4>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${m.status === 'Completed' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-300'}">${m.status}</span>
+          </div>
+          <p class="text-xs text-slate-400"><i class="fa-regular fa-clock mr-1.5 text-indigo-400"></i>${new Date(m.datetime).toLocaleString()}</p>
+          ${m.notes ? `<p class="text-xs text-slate-300 bg-slate-950 p-2 rounded border border-slate-800/80">${m.notes}</p>` : ''}
+        `;
+        container.appendChild(card);
+      });
+
+      document.getElementById('stat-meetings-count').innerText = appState.meetings.length;
+      document.getElementById('stat-upcoming-meetings').innerText = upcoming;
+    }
+
+    // Leads / Pipeline Logic
+    function handleAddLead(e) {
+      e.preventDefault();
+      const company = document.getElementById('lead-company').value;
       const tier = document.getElementById('lead-tier').value;
       const value = parseFloat(document.getElementById('lead-value').value) || 0;
       const status = document.getElementById('lead-status').value;
       const owner = document.getElementById('lead-owner').value;
-      const email = document.getElementById('lead-email').value.trim();
-      const followup = document.getElementById('lead-followup').value;
-      const notes = document.getElementById('lead-notes').value.trim();
+      const email = document.getElementById('lead-email').value;
 
-      const leadData = { id: id || 'lead_' + Date.now(), company, tier, value, status, owner, email, followup, notes };
-
-      if (id) {
-        const idx = window.appState.leads.findIndex(l => l.id === id);
-        if (idx !== -1) window.appState.leads[idx] = leadData;
-        showToast('Updated lead details', 'success');
-      } else {
-        window.appState.leads.unshift(leadData);
-        showToast('Added new sponsor prospect!', 'success');
-        if (status === 'Closed-Won') triggerConfetti();
-      }
-
+      appState.leads.push({ id: Date.now(), company, tier, value, status, owner, email });
+      saveData();
       closeModal('add-lead-modal');
-      saveToLocalStorage();
-      renderAll();
+      renderLeadsTable();
+      e.target.reset();
     }
 
-    function editLead(id) {
-      const lead = window.appState.leads.find(l => l.id === id);
-      if (!lead) return;
+    function renderLeadsTable() {
+      const tbody = document.getElementById('leads-table-body');
+      tbody.innerHTML = '';
 
-      document.getElementById('modal-lead-title').innerHTML = `<i class="fa-solid fa-pen-to-square text-indigo-400"></i> Edit ${esc(lead.company)}`;
-      document.getElementById('lead-id').value = lead.id;
-      document.getElementById('lead-company').value = lead.company;
-      document.getElementById('lead-tier').value = lead.tier;
-      document.getElementById('lead-value').value = lead.value;
-      document.getElementById('lead-status').value = lead.status;
-      document.getElementById('lead-owner').value = lead.owner || 'You';
-      document.getElementById('lead-email').value = lead.email || '';
-      document.getElementById('lead-followup').value = lead.followup || '';
-      document.getElementById('lead-notes').value = lead.notes || '';
+      let totalRaised = 0;
+      let pipelineTotal = 0;
 
-      openModal('add-lead-modal');
+      appState.leads.forEach(l => {
+        if (l.status === 'Closed-Won') totalRaised += l.value;
+        else pipelineTotal += l.value;
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-900/50';
+        tr.innerHTML = `
+          <td class="px-4 py-3 font-semibold text-white">${l.company}</td>
+          <td class="px-4 py-3 text-slate-400">${l.tier}</td>
+          <td class="px-4 py-3 font-bold">${appState.currencySymbol}${l.value.toLocaleString()}</td>
+          <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${l.status === 'Closed-Won' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-indigo-500/20 text-indigo-300'}">${l.status}</span></td>
+          <td class="px-4 py-3 text-slate-400">${l.email || '—'}</td>
+          <td class="px-4 py-3 text-slate-400">—</td>
+          <td class="px-4 py-3 text-slate-400">${l.owner || '—'}</td>
+          <td class="px-4 py-3 text-right">
+            <button onclick="deleteLead(${l.id})" class="text-slate-500 hover:text-rose-400"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Update Global Top Metrics
+      const pct = Math.min(100, Math.round((totalRaised / appState.targetGoal) * 100));
+      document.getElementById('stat-target-value').innerText = appState.currencySymbol + appState.targetGoal.toLocaleString();
+      document.getElementById('stat-raised-value').innerText = appState.currencySymbol + totalRaised.toLocaleString();
+      document.getElementById('stat-raised-percent').innerText = `(${pct}%)`;
+      document.getElementById('stat-progress-bar').style.width = pct + '%';
+
+      document.getElementById('stat-pipeline-value').innerText = appState.currencySymbol + pipelineTotal.toLocaleString();
+      document.getElementById('stat-active-leads-count').innerText = appState.leads.length;
     }
 
     function deleteLead(id) {
-      window.appState.leads = window.appState.leads.filter(l => l.id !== id);
-      saveToLocalStorage();
-      renderAll();
-      showToast('Lead removed', 'info');
+      appState.leads = appState.leads.filter(l => l.id !== id);
+      saveData();
+      renderLeadsTable();
     }
 
+    // Weekly Plan Logic
     function renderWeeklyPlan() {
       const container = document.getElementById('weekly-plan-container');
       container.innerHTML = '';
 
-      (window.appState.weeklyPlan || []).forEach((week, wIndex) => {
+      for (let w = 1; w <= 4; w++) {
+        const weekTasks = appState.weeklyTasks.filter(t => t.week === w);
         const card = document.createElement('div');
-        card.className = "glass-card p-4 rounded-xl border border-slate-800 flex flex-col justify-between space-y-4 relative overflow-hidden";
-        const completedTasks = week.tasks.filter(t => t.completed).length;
-        const totalTasks = week.tasks.length;
-        const percent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-
+        card.className = 'glass-card p-4 rounded-xl border border-slate-800 space-y-3';
         card.innerHTML = `
-          <div class="space-y-3">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-              <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Week ${week.weekNum}</span>
-              <span class="text-xs font-bold ${percent === 100 ? 'text-emerald-400' : 'text-slate-400'}">${completedTasks}/${totalTasks} (${percent}%)</span>
-            </div>
-
-            <h3 class="text-xs font-bold text-white leading-snug">${esc(week.title)}</h3>
-
-            <div class="space-y-2 pt-1">
-              ${week.tasks.map((task, tIndex) => `
-                <div class="flex items-start gap-2 bg-slate-900/60 p-2 rounded-lg border border-slate-800/60">
-                  <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleWeeklyTask(${wIndex},${tIndex})" class="mt-0.5 rounded bg-slate-950 border-slate-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
-                  <span class="text-xs ${task.completed ? 'line-through text-slate-500' : 'text-slate-300'} flex-1">${esc(task.text)}</span>
-                  <button onclick="deleteWeeklyTask(${wIndex},${tIndex})" class="text-slate-600 hover:text-rose-400 text-[10px]"><i class="fa-solid fa-xmark"></i></button>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-
-          <div class="pt-2 border-t border-slate-800">
-            <button onclick="addWeeklyTaskPrompt(${wIndex})" class="w-full py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs text-indigo-400 hover:text-indigo-300 font-semibold transition flex items-center justify-center gap-1">
-              <i class="fa-solid fa-plus text-[10px]"></i> Add Action Task
-            </button>
+          <h3 class="font-bold text-white text-sm flex items-center justify-between border-b border-slate-800 pb-2">
+            <span>Week ${w}</span>
+            <span class="text-[10px] text-slate-500 font-normal">Roadmap Phase</span>
+          </h3>
+          <div class="space-y-2">
+            ${weekTasks.map(t => `
+              <div class="flex items-center gap-2 text-xs">
+                <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleWeeklyTask(${t.id})" class="rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-0">
+                <span class="${t.done ? 'line-through text-slate-500' : 'text-slate-300'}">${t.title}</span>
+              </div>
+            `).join('')}
           </div>
         `;
         container.appendChild(card);
-      });
+      }
     }
 
-    function toggleWeeklyTask(wIndex, tIndex) {
-      window.appState.weeklyPlan[wIndex].tasks[tIndex].completed = !window.appState.weeklyPlan[wIndex].tasks[tIndex].completed;
-      saveToLocalStorage();
-      renderWeeklyPlan();
-    }
-
-    function addWeeklyTaskPrompt(wIndex) {
-      const text = prompt("Enter new action item for Week " + (wIndex + 1) + ":");
-      if (text && text.trim()) {
-        window.appState.weeklyPlan[wIndex].tasks.push({ id: 'task_' + Date.now(), text: text.trim(), completed: false });
-        saveToLocalStorage();
+    function toggleWeeklyTask(id) {
+      const task = appState.weeklyTasks.find(t => t.id === id);
+      if (task) {
+        task.done = !task.done;
+        saveData();
         renderWeeklyPlan();
-        showToast('Task added!', 'success');
       }
     }
 
-    function deleteWeeklyTask(wIndex, tIndex) {
-      window.appState.weeklyPlan[wIndex].tasks.splice(tIndex, 1);
-      saveToLocalStorage();
-      renderWeeklyPlan();
-    }
-
-    function resetWeeklyPlanToDefault() {
-      window.appState.weeklyPlan = clone(defaultWeeklyPlan);
-      saveToLocalStorage();
-      renderWeeklyPlan();
-      showToast('Reset roadmap to standard blueprint.', 'info');
-    }
-
-    function saveGoogleSheetURL() {
-      const url = document.getElementById('google-sheet-url').value;
-      localStorage.setItem('sponsor_pulse_sheet_url', url);
-      showToast('Saved Sheet link!', 'success');
-    }
-
-    function openGoogleSheetURL() {
-      const url = document.getElementById('google-sheet-url').value || localStorage.getItem('sponsor_pulse_sheet_url');
-      if (url) window.open(url, '_blank');
-      else showToast('Please enter a Google Sheet URL first.', 'warning');
-    }
-
-    // Gemini AI Chat
-    async function sendGeminiPrompt(customPromptText) {
-      const inputEl = document.getElementById('gemini-input');
-      const prompt = customPromptText || inputEl.value.trim();
-
-      if (!prompt) return;
-      if (!customPromptText) inputEl.value = '';
-
-      appendChatMessage('user', prompt);
-      const loadingId = appendChatLoading();
-
-      try {
-        const apiKey = ""; // Insert Gemini API key if available
-        if (!apiKey) {
-          setTimeout(() => {
-            removeChatLoading(loadingId);
-            appendChatMessage('ai', `
-              <p><strong>Gemini AI Assistant Note:</strong></p>
-              <p>To enable live AI generation, configure your Gemini API Key in the script, or use our quick prompt templates to generate customized emails in PKR format offline!</p>
-            `);
-          }, 800);
-          return;
-        }
-
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-        const systemInstruction = `You are Gemini, an expert Sponsorship & Finance Advisor for student society events in Pakistan. Provide response in PKR context using bold text and bullet points.`;
-
-        const response = await fetch(apiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            systemInstruction: { parts: [{ text: systemInstruction }] }
-          })
-        });
-
-        const data = await response.json();
-        removeChatLoading(loadingId);
-
-        if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
-          appendChatMessage('ai', data.candidates[0].content.parts[0].text);
-        } else {
-          appendChatMessage('ai', "Could not generate response at this time. Please try again.");
-        }
-      } catch (err) {
-        removeChatLoading(loadingId);
-        appendChatMessage('ai', "Error connecting to AI service. Please check your internet connection.");
-      }
-    }
-
-    function useGeminiTemplate(type) {
-      if (type === 'zero') {
-        sendGeminiPrompt("Give us a 5-step checklist for a university society in Pakistan starting its sponsorship drive today from zero.");
-      } else if (type === 'meeting_invite') {
-        sendGeminiPrompt("Draft a cold email in PKR context to request a 15-minute sponsorship pitch call with a corporate brand head.");
-      } else if (type === 'packages') {
-        sendGeminiPrompt("Outline Title (Rs. 200k), Gold (Rs. 100k), and Silver (Rs. 50k) sponsorship packages with clear deliverables for sponsors in Pakistan.");
-      }
-    }
-
-    function appendChatMessage(sender, htmlContent) {
-      const chatBody = document.getElementById('gemini-chat-body');
-      const msgDiv = document.createElement('div');
-      msgDiv.className = "flex items-start gap-3" + (sender === 'user' ? ' justify-end' : '');
-
-      if (sender === 'user') {
-        msgDiv.innerHTML = `
-          <div class="bg-indigo-600 text-white p-3.5 rounded-xl rounded-tr-none max-w-xl text-xs leading-relaxed space-y-1">
-            <p>${esc(htmlContent)}</p>
-          </div>
-          <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-300 flex items-center justify-center shrink-0 font-bold text-xs">You</div>
-        `;
-      } else {
-        msgDiv.innerHTML = `
-          <div class="w-8 h-8 rounded-lg bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 flex items-center justify-center shrink-0">
-            <i class="fa-solid fa-robot text-sm"></i>
-          </div>
-          <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl rounded-tl-none max-w-2xl text-xs leading-relaxed text-slate-200 space-y-2">
-            ${htmlContent}
-          </div>
-        `;
-      }
-
-      chatBody.appendChild(msgDiv);
-      chatBody.scrollTop = chatBody.scrollHeight;
-    }
-
-    function appendChatLoading() {
-      const id = 'loading_' + Date.now();
-      const chatBody = document.getElementById('gemini-chat-body');
-      const msgDiv = document.createElement('div');
-      msgDiv.id = id;
-      msgDiv.className = "flex items-start gap-3";
-      msgDiv.innerHTML = `
-        <div class="w-8 h-8 rounded-lg bg-indigo-600/30 text-indigo-300 flex items-center justify-center shrink-0">
-          <i class="fa-solid fa-robot text-sm"></i>
-        </div>
-        <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl text-xs text-slate-400 flex items-center gap-2">
-          <i class="fa-solid fa-circle-notch animate-spin text-indigo-400"></i> Gemini is thinking...
-        </div>
-      `;
-      chatBody.appendChild(msgDiv);
-      chatBody.scrollTop = chatBody.scrollHeight;
-      return id;
-    }
-
-    function removeChatLoading(id) {
-      const el = document.getElementById(id);
-      if (el) el.remove();
-    }
-
-    function clearGeminiChat() {
-      document.getElementById('gemini-chat-body').innerHTML = '';
-      showToast('Chat history cleared', 'info');
-    }
-
-    // Tab Navigation
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
-        btn.classList.add('text-slate-400');
-      });
-
-      const activeTabEl = document.getElementById(`view-${tabId}`);
-      if (activeTabEl) activeTabEl.classList.remove('hidden');
-
-      const activeBtn = document.getElementById(`tab-${tabId}`);
-      if (activeBtn) {
-        activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
-        activeBtn.classList.remove('text-slate-400');
-      }
-
-      window.appState.activeTab = tabId;
-    }
-
-    function openMeetingEmailGeneratorModal() {
-      openModal('email-gen-modal');
-    }
-
-    function copyMeetingEmailTemplate() {
-      const text = document.getElementById('email-template-text').innerText;
-      navigator.clipboard.writeText(text);
-      showToast('Email template copied to clipboard!', 'success');
-    }
-
-    function triggerConfetti() {
-      if (typeof confetti === 'function') {
-        confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 } });
-      }
-    }
-
-    /* ===== Storage ===== */
-    function saveToLocalStorage() {
-      const a = S();
-      try {
-        localStorage.setItem('sponsorpulse_pk_data', JSON.stringify({
-          requirements: a.requirements,
-          meetings: a.meetings,
-          leads: a.leads,
-          weeklyPlan: a.weeklyPlan,
-          targetGoal: a.targetGoal,
-          currencySymbol: a.currencySymbol,
-          daysRemaining: a.daysRemaining,
-          notes: a.notes,
-          team: a.team,
-          tiers: a.tiers,
-          categories: a.categories,
-          lastName: a.lastName,
-          firebaseConfig: a.firebaseConfig
-        }));
-      } catch(e) {
-        showToast('Could not save data (browser storage blocked or full)', 'warning');
-      }
-    }
-
-    function loadLocalStorage() {
-      const a = S();
-      let d = null;
-      try {
-        d = JSON.parse(localStorage.getItem('sponsorpulse_pk_data') || 'null');
-      } catch(e) {
-        console.error(e);
-      }
-      d = d || {};
-      a.requirements = d.requirements || clone(defaultRequirements);
-      a.meetings = d.meetings || clone(defaultMeetings);
-      a.leads = d.leads || clone(defaultLeads);
-      a.weeklyPlan = d.weeklyPlan || clone(defaultWeeklyPlan);
-      a.targetGoal = d.targetGoal ?? 500000;
-      a.currencySymbol = d.currencySymbol || 'Rs. ';
-      a.daysRemaining = d.daysRemaining ?? 30;
-      a.notes = d.notes || clone(defaultNotes);
-      a.team = d.team || [...defaultTeam];
-      a.tiers = d.tiers || clone(defaultTiers);
-      a.categories = d.categories || [...defaultCats];
-      a.lastName = d.lastName || '';
-      a.firebaseConfig = d.firebaseConfig || null;
-    }
-
-    /* ===== Cycle Requirement Status ===== */
-    function cycleReqStatus(idx) {
-      const statuses = ['Needed', 'In Discussion', 'Secured'];
-      const current = window.appState.requirements[idx].status || 'Needed';
-      const nextIdx = (statuses.indexOf(current) + 1) % statuses.length;
-      window.appState.requirements[idx].status = statuses[nextIdx];
-      saveToLocalStorage();
-      renderAll();
-      showToast(`Requirement status changed to ${statuses[nextIdx]}`, 'info');
-      if (statuses[nextIdx] === 'Secured') triggerConfetti();
-    }
-
-    /* ===== Convert Meeting to Closed-Won ===== */
-    function convertToClosedWon(meetingId) {
-      const meeting = window.appState.meetings.find(m => m.id === meetingId);
-      if (!meeting) return;
-
-      let lead = window.appState.leads.find(l => l.company.toLowerCase() === meeting.company.toLowerCase());
-      if (lead) {
-        lead.status = 'Closed-Won';
-      } else {
-        window.appState.leads.unshift({
-          id: 'lead_' + Date.now(),
-          company: meeting.company,
-          tier: meeting.tier,
-          value: tierValue(meeting.tier),
-          status: 'Closed-Won',
-          email: '',
-          followup: '',
-          owner: meeting.owner,
-          notes: meeting.agenda || 'Closed from meeting pitch.'
-        });
-      }
-
-      saveToLocalStorage();
-      renderAll();
-      showToast(`Sponsorship with ${meeting.company} marked as Closed-Won! 🎉`, 'success');
-      triggerConfetti();
-    }
-
-    /* ===== Notes & Requirements Management ===== */
-    let activeCompleteNoteId = null;
-
-    function renderNotes() {
-      const notes = window.appState.notes || [];
-      const pendingList = document.getElementById('notes-pending-list');
-      const doneList = document.getElementById('notes-done-list');
-      const badge = document.getElementById('notes-badge');
-
-      const pending = notes.filter(n => !n.done);
-      const done = notes.filter(n => n.done);
-
-      document.getElementById('notes-pending-count').innerText = pending.length;
-      document.getElementById('notes-done-count').innerText = done.length;
-
-      if (pending.length > 0) {
-        badge.classList.remove('hidden');
-        badge.classList.add('flex');
-        badge.innerText = pending.length;
-      } else {
-        badge.classList.add('hidden');
-        badge.classList.remove('flex');
-      }
-
-      pendingList.innerHTML = pending.length === 0 
-        ? '<p class="text-xs text-slate-500 py-4 text-center">No pending notes or requirements.</p>'
-        : pending.map(n => {
-            const priorityColor = n.priority === 'High' ? 'bg-rose-500/20 text-rose-300 border-rose-500/30' : (n.priority === 'Low' ? 'bg-slate-800 text-slate-400 border-slate-700' : 'bg-amber-500/20 text-amber-300 border-amber-500/30');
-            return `
-              <div class="glass-card p-3 rounded-xl border border-slate-800 flex items-center justify-between gap-3 note-in">
-                <div class="space-y-1 flex-1">
-                  <div class="flex items-center gap-2">
-                    <span class="px-2 py-0.5 text-[10px] font-bold rounded border ${priorityColor}">${esc(n.priority || 'Medium')}</span>
-                    <span class="px-2 py-0.5 text-[10px] font-semibold rounded bg-slate-800 text-slate-300">${esc(n.kind || 'Note')}</span>
-                  </div>
-                  <p class="text-xs text-slate-200">${esc(n.text)}</p>
-                </div>
-                <div class="flex items-center gap-2">
-                  <button onclick="openCompleteNoteModal('${n.id}')" class="px-2.5 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 rounded-lg text-xs font-bold transition flex items-center gap-1">
-                    <i class="fa-solid fa-check"></i> Complete
-                  </button>
-                  <button onclick="deleteNote('${n.id}')" class="p-1.5 text-slate-500 hover:text-rose-400 transition">
-                    <i class="fa-solid fa-trash-can"></i>
-                  </button>
-                </div>
-              </div>
-            `;
-          }).join('');
-
-      doneList.innerHTML = done.length === 0
-        ? '<p class="text-xs text-slate-500 py-4 text-center">No completed items yet.</p>'
-        : done.map(n => `
-            <div class="glass-card p-3 rounded-xl border border-slate-800/60 flex items-center justify-between gap-3 opacity-75">
-              <div class="space-y-1 flex-1">
-                <p class="text-xs text-slate-400 line-through">${esc(n.text)}</p>
-                <p class="text-[10px] text-emerald-400 font-medium">
-                  <i class="fa-solid fa-circle-check mr-1"></i> Completed by <span class="font-bold">${esc(n.doneBy || 'Team Member')}</span>
-                </p>
-              </div>
-              <button onclick="deleteNote('${n.id}')" class="p-1.5 text-slate-500 hover:text-rose-400 transition">
-                <i class="fa-solid fa-trash-can"></i>
-              </button>
-            </div>
-          `).join('');
-    }
-
-    function handleAddNote(e) {
-      e.preventDefault();
-      const textEl = document.getElementById('note-text');
-      const text = textEl.value.trim();
-      if (!text) return;
-
-      const kind = document.getElementById('note-kind').value;
-      const priority = document.getElementById('note-priority').value;
-
-      window.appState.notes.unshift({
-        id: 'n_' + Date.now(),
-        text,
-        kind,
-        priority,
-        created: Date.now(),
-        done: false
-      });
-
-      textEl.value = '';
-      saveToLocalStorage();
-      renderAll();
-      showToast('Note added', 'success');
-    }
-
-    function openCompleteNoteModal(id) {
-      const note = window.appState.notes.find(n => n.id === id);
-      if (!note) return;
-      activeCompleteNoteId = id;
-      document.getElementById('complete-note-text').innerText = note.text;
-      document.getElementById('complete-name').value = window.appState.lastName || '';
-      openModal('complete-note-modal');
-    }
-
-    function submitComplete(e) {
-      e.preventDefault();
-      const name = document.getElementById('complete-name').value.trim();
-      if (!name || !activeCompleteNoteId) return;
-
-      const note = window.appState.notes.find(n => n.id === activeCompleteNoteId);
-      if (note) {
-        note.done = true;
-        note.doneBy = name;
-        note.doneAt = Date.now();
-        window.appState.lastName = name;
-      }
-
-      closeModal('complete-note-modal');
-      activeCompleteNoteId = null;
-      saveToLocalStorage();
-      renderAll();
-      showToast('Task marked as completed!', 'success');
-    }
-
-    function clearCompletedNotes() {
-      window.appState.notes = window.appState.notes.filter(n => !n.done);
-      saveToLocalStorage();
-      renderAll();
-      showToast('Cleared completed notes', 'info');
-    }
-
-    function deleteNote(id) {
-      window.appState.notes = window.appState.notes.filter(n => n.id !== id);
-      saveToLocalStorage();
-      renderAll();
-      showToast('Note deleted', 'info');
-    }
-
-    /* ===== Fill Dropdowns & Selects ===== */
-    function fillSelects() {
-      const a = S();
-      
-      const teamDataList = document.getElementById('team-datalist');
-      if (teamDataList) {
-        teamDataList.innerHTML = a.team.map(t => `<option value="${esc(t)}">`).join('');
-      }
-
-      const meetingOwnerSelect = document.getElementById('meeting-owner');
-      if (meetingOwnerSelect) {
-        const current = meetingOwnerSelect.value;
-        meetingOwnerSelect.innerHTML = a.team.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('');
-        if (current && a.team.includes(current)) meetingOwnerSelect.value = current;
-      }
-
-      const leadOwnerSelect = document.getElementById('lead-owner');
-      if (leadOwnerSelect) {
-        const current = leadOwnerSelect.value;
-        leadOwnerSelect.innerHTML = a.team.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('');
-        if (current && a.team.includes(current)) leadOwnerSelect.value = current;
-      }
-
-      const reqCategorySelect = document.getElementById('req-category');
-      if (reqCategorySelect) {
-        const current = reqCategorySelect.value;
-        reqCategorySelect.innerHTML = a.categories.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
-        if (current && a.categories.includes(current)) reqCategorySelect.value = current;
-      }
-
-      const leadTierSelect = document.getElementById('lead-tier');
-      if (leadTierSelect) {
-        const current = leadTierSelect.value;
-        leadTierSelect.innerHTML = a.tiers.map(t => `<option value="${esc(t.name)}">${esc(t.name)} (${a.currencySymbol}${Number(t.value).toLocaleString()})</option>`).join('');
-        if (current) leadTierSelect.value = current;
-      }
-
-      const meetingTierSelect = document.getElementById('meeting-tier');
-      if (meetingTierSelect) {
-        const current = meetingTierSelect.value;
-        meetingTierSelect.innerHTML = a.tiers.map(t => `<option value="${esc(t.name)}">${esc(t.name)}</option>`).join('');
-        if (current) meetingTierSelect.value = current;
-      }
-    }
-
-    /* ===== Settings Modal & List Managers ===== */
-    let activeQuickType = null;
-
-    function openSettings() {
-      const a = S();
-      document.getElementById('settings-target').value = a.targetGoal;
-      document.getElementById('settings-currency').value = a.currencySymbol;
-      document.getElementById('settings-days').value = a.daysRemaining;
-      document.getElementById('settings-firebase-config').value = a.firebaseConfig ? JSON.stringify(a.firebaseConfig) : '';
-
-      renderSettingsListManagers();
-      openModal('settings-modal');
-    }
-
-    function renderSettingsListManagers() {
-      const a = S();
-      const container = document.getElementById('list-managers');
-      container.innerHTML = `
-        <div class="space-y-2">
-          <div class="flex justify-between items-center">
-            <label class="text-xs font-semibold text-slate-300">Team Members</label>
-            <button onclick="openQuickAdd('team')" class="text-[11px] text-indigo-400 hover:underline"><i class="fa-solid fa-plus"></i> Add Member</button>
-          </div>
-          <div class="flex flex-wrap gap-1.5">
-            ${a.team.map((t, idx) => `
-              <span class="px-2 py-1 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-300 flex items-center gap-1.5">
-                ${esc(t)}${a.team.length > 1 ? `<button onclick="removeTeamMember(${idx})" class="text-slate-500 hover:text-rose-400"><i class="fa-solid fa-xmark"></i></button>` : ''}
-              </span>
-            `).join('')}
-          </div>
-        </div>
-
-        <div class="space-y-2 pt-2">
-          <div class="flex justify-between items-center">
-            <label class="text-xs font-semibold text-slate-300">Sponsorship Tiers</label>
-            <button onclick="openQuickAdd('tier')" class="text-[11px] text-indigo-400 hover:underline"><i class="fa-solid fa-plus"></i> Add Tier</button>
-          </div>
-          <div class="flex flex-wrap gap-1.5">
-            ${a.tiers.map((t, idx) => `
-              <span class="px-2 py-1 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-300 flex items-center gap-1.5">
-                ${esc(t.name)} (${a.currencySymbol}${Number(t.value).toLocaleString()})${a.tiers.length > 1 ? `<button onclick="removeTier(${idx})" class="text-slate-500 hover:text-rose-400"><i class="fa-solid fa-xmark"></i></button>` : ''}
-              </span>
-            `).join('')}
-          </div>
-        </div>
-
-        <div class="space-y-2 pt-2">
-          <div class="flex justify-between items-center">
-            <label class="text-xs font-semibold text-slate-300">Budget Categories</label>
-            <button onclick="openQuickAdd('category')" class="text-[11px] text-indigo-400 hover:underline"><i class="fa-solid fa-plus"></i> Add Category</button>
-          </div>
-          <div class="flex flex-wrap gap-1.5">
-            ${a.categories.map((c, idx) => `
-              <span class="px-2 py-1 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-300 flex items-center gap-1.5">
-                ${esc(c)}${a.categories.length > 1 ? `<button onclick="removeCategory(${idx})" class="text-slate-500 hover:text-rose-400"><i class="fa-solid fa-xmark"></i></button>` : ''}
-              </span>
-            `).join('')}
-          </div>
-        </div>
-      `;
-    }
-
-    function saveSettings() {
-      const a = S();
-      a.targetGoal = parseFloat(document.getElementById('settings-target').value) || 500000;
-      a.currencySymbol = document.getElementById('settings-currency').value || 'Rs. ';
-      a.daysRemaining = parseInt(document.getElementById('settings-days').value) || 30;
-
-      const fbRaw = document.getElementById('settings-firebase-config').value.trim();
-      if (fbRaw) {
-        try {
-          a.firebaseConfig = JSON.parse(fbRaw);
-        } catch(e) {
-          showToast('Invalid Firebase Config JSON format', 'warning');
-        }
-      } else {
-        a.firebaseConfig = null;
-      }
-
-      saveToLocalStorage();
-      renderAll();
-      closeModal('settings-modal');
-      showToast('Settings saved successfully', 'success');
-    }
-
-    function openQuickAdd(type) {
-      activeQuickType = type;
-      const titleMap = { team: 'Add Team Member', tier: 'Add Sponsorship Tier', category: 'Add Budget Category' };
-      document.getElementById('quick-title').innerText = titleMap[type] || 'Add';
-      document.getElementById('quick-name').value = '';
-      
-      const valueWrap = document.getElementById('quick-value-wrap');
-      if (type === 'tier') {
-        valueWrap.classList.remove('hidden');
-        document.getElementById('quick-value').value = 50000;
-      } else {
-        valueWrap.classList.add('hidden');
-      }
-
-      openModal('quick-add-modal');
-    }
-
-    function submitQuick(e) {
-      e.preventDefault();
-      const name = document.getElementById('quick-name').value.trim();
-      if (!name || !activeQuickType) return;
-
-      const a = S();
-      if (activeQuickType === 'team') {
-        if (!a.team.includes(name)) a.team.push(name);
-      } else if (activeQuickType === 'tier') {
-        const val = parseFloat(document.getElementById('quick-value').value) || 50000;
-        if (!a.tiers.some(t => t.name.toLowerCase() === name.toLowerCase())) {
-          a.tiers.push({ name, value: val });
-        }
-      } else if (activeQuickType === 'category') {
-        if (!a.categories.includes(name)) a.categories.push(name);
-      }
-
-      closeModal('quick-add-modal');
-      saveToLocalStorage();
-      fillSelects();
-      renderSettingsListManagers();
-      showToast('Added item', 'success');
-    }
-
-    function removeTeamMember(idx) {
-      window.appState.team.splice(idx, 1);
-      saveToLocalStorage();
-      fillSelects();
-      renderSettingsListManagers();
-    }
-
-    function removeTier(idx) {
-      window.appState.tiers.splice(idx, 1);
-      saveToLocalStorage();
-      fillSelects();
-      renderSettingsListManagers();
-    }
-
-    function removeCategory(idx) {
-      window.appState.categories.splice(idx, 1);
-      saveToLocalStorage();
-      fillSelects();
-      renderSettingsListManagers();
-    }
-
-    /* ===== CSV Export & Import ===== */
+    // CSV Export
     function exportToCSV() {
-      const leads = window.appState.leads || [];
-      if (leads.length === 0) {
-        showToast('No leads available to export.', 'warning');
-        return;
+      let csv = "Type,Title/Company,Category/Tier,Amount,Status\n";
+      appState.requirements.forEach(r => {
+        csv += `Requirement,"${r.title}","${r.category}",${r.cost},"${r.status}"\n`;
+      });
+      appState.leads.forEach(l => {
+        csv += `Lead,"${l.company}","${l.tier}",${l.value},"${l.status}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.setAttribute('href', url);
+      a.setAttribute('download', 'sponsorpulse_export.csv');
+      a.click();
+    }
+
+    function saveSheetLink() {
+      const link = document.getElementById('google-sheet-url').value;
+      appState.sheetLink = link;
+      saveData();
+      alert('Google Sheet link saved!');
+    }
+
+    // AI Generator Placeholder
+    function generateAIPitch() {
+      const prompt = document.getElementById('ai-prompt-input').value;
+      if (!prompt) return;
+
+      const outContainer = document.getElementById('ai-output-container');
+      const outText = document.getElementById('ai-output-text');
+      
+      outText.innerText = `Subject: Executive Sponsorship Proposal — ${appState.currencySymbol}Sponsorship Opportunity\n\nDear Corporate Partner,\n\nOn behalf of our society executive team, we are delighted to invite your organization to join us as an official sponsor for our upcoming drive.\n\nKey Highlights:\n- Expected Audience: 1,500+ attendees\n- Targeted Marketing & On-Stage Branding\n\nWe look forward to partnering with your brand.\n\nWarm regards,\nSponsorship Team`;
+      outContainer.classList.remove('hidden');
+    }
+
+    function copyAIPitch() {
+      const text = document.getElementById('ai-output-text').innerText;
+      navigator.clipboard.writeText(text);
+      alert('Pitch proposal copied to clipboard!');
+    }
+
+    // Render All
+    function renderAll() {
+      document.getElementById('header-countdown').innerText = `${appState.daysRemaining} Days Left`;
+      if (appState.sheetLink) {
+        document.getElementById('google-sheet-url').value = appState.sheetLink;
       }
-
-      let csv = 'Company,Target Tier,Deal Value (Rs.),Status,Email,FollowUp Date,Owner,Notes\n';
-      leads.forEach(l => {
-        csv += `"${(l.company||'').replace(/"/g, '""')}","${(l.tier||'').replace(/"/g, '""')}",${l.value||0},"${(l.status||'').replace(/"/g, '""')}","${(l.email||'').replace(/"/g, '""')}","${(l.followup||'').replace(/"/g, '""')}","${(l.owner||'').replace(/"/g, '""')}","${(l.notes||'').replace(/"/g, '""')}"\n`;
-      });
-
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.setAttribute('download', `SponsorPulse_Leads_${new Date().toISOString().slice(0, 10)}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      showToast('Exported CSV file!', 'success');
+      renderRequirements();
+      renderNotes();
+      renderMeetings();
+      renderLeadsTable();
+      renderWeeklyPlan();
     }
 
-    function handleCSVImport() {
-      const raw = document.getElementById('csv-paste-area').value.trim();
-      if (!raw) {
-        showToast('Please paste valid CSV data first.', 'warning');
-        return;
-      }
-
-      const lines = raw.split('\n');
-      let importedCount = 0;
-
-      lines.forEach((line, idx) => {
-        if (idx === 0 && line.toLowerCase().includes('company')) return;
-        const parts = line.split(',').map(s => s.trim().replace(/^"|"$/g, ''));
-        if (parts.length >= 2 && parts[0]) {
-          window.appState.leads.unshift({
-            id: 'lead_' + Date.now() + '_' + idx,
-            company: parts[0],
-            tier: parts[1] || 'Silver Sponsor',
-            value: parseFloat(parts[2]) || 50000,
-            status: parts[3] || 'Prospect',
-            email: parts[4] || '',
-            followup: parts[5] || '',
-            owner: parts[6] || 'You',
-            notes: parts[7] || 'Imported from CSV'
-          });
-          importedCount++;
-        }
-      });
-
-      closeModal('import-csv-modal');
-      document.getElementById('csv-paste-area').value = '';
-      saveToLocalStorage();
-      renderAll();
-      showToast(`Successfully imported ${importedCount} leads!`, 'success');
-    }
-
-    /* ===== Toast Notification System ===== */
-    function showToast(message, type = 'info') {
-      const container = document.getElementById('toast-container');
-      if (!container) return;
-
-      const toast = document.createElement('div');
-      const bgMap = {
-        success: 'bg-emerald-900/90 text-emerald-200 border-emerald-500/50',
-        warning: 'bg-amber-900/90 text-amber-200 border-amber-500/50',
-        info: 'bg-indigo-900/90 text-indigo-200 border-indigo-500/50',
-        error: 'bg-rose-900/90 text-rose-200 border-rose-500/50'
-      };
-      const iconMap = {
-        success: 'fa-circle-check',
-        warning: 'fa-triangle-exclamation',
-        info: 'fa-circle-info',
-        error: 'fa-circle-xmark'
-      };
-
-      toast.className = `pointer-events-auto px-4 py-3 rounded-xl border ${bgMap[type] || bgMap.info} shadow-xl backdrop-blur-md text-xs font-semibold flex items-center gap-2.5 transition-all duration-300 transform translate-y-2 opacity-0`;
-      toast.innerHTML = `<i class="fa-solid ${iconMap[type] || iconMap.info} text-sm"></i> <span>${esc(message)}</span>`;
-
-      container.appendChild(toast);
-
-      requestAnimationFrame(() => {
-        toast.classList.remove('translate-y-2', 'opacity-0');
-      });
-
-      setTimeout(() => {
-        toast.classList.add('opacity-0', 'translate-y-2');
-        setTimeout(() => toast.remove(), 300);
-      }, 3200);
-    }
-
-    function openModal(id) {
-      const modal = document.getElementById(id);
-      if (modal) modal.classList.remove('hidden');
-    }
-
-    function closeModal(id) {
-      const modal = document.getElementById(id);
-      if (modal) modal.classList.add('hidden');
-    }
+    // Load App
+    document.addEventListener('DOMContentLoaded', loadInitialData);
   </script>
 </body>
 </html>
