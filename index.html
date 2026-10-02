@@ -421,7 +421,7 @@
             <option value="Contacted">Contacted</option>
             <option value="Pitch Sent">Pitch Sent</option>
             <option value="Meeting Scheduled">Meeting Scheduled</option>
-            <option value="Closed-Won">Closed-Won</option>
+            <option value="Closed-Won">Closed-Won 🏆</option>
             <option value="Closed-Lost">Closed-Lost</option>
           </select>
         </div>
@@ -577,7 +577,7 @@
                 <i class="fa-solid fa-robot text-sm"></i>
               </div>
               <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl rounded-tl-none max-w-2xl text-xs leading-relaxed text-slate-200 space-y-2">
-                <p class="font-bold text-indigo-300">Salam Team!</p>
+                <p class="font-bold text-indigo-300">Salam Team! 👋</p>
                 <p>I am your Gemini AI Sponsorship Advisor calibrated for events in Pakistan (PKR). Ask me to draft corporate emails, outline budget requirements, or design tier packages!</p>
               </div>
             </div>
@@ -640,7 +640,7 @@
             <select id="req-status" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
               <option value="Needed">Needed (Unfunded)</option>
               <option value="In Discussion">In Sponsor Discussion</option>
-              <option value="Secured">Secured</option>
+              <option value="Secured">Secured 🏆</option>
             </select>
           </div>
         </div>
@@ -752,7 +752,7 @@
               <option value="Contacted">Contacted</option>
               <option value="Pitch Sent">Pitch Sent</option>
               <option value="Meeting Scheduled">Meeting Scheduled</option>
-              <option value="Closed-Won">Closed-Won</option>
+              <option value="Closed-Won">Closed-Won 🏆</option>
               <option value="Closed-Lost">Closed-Lost</option>
             </select>
           </div>
@@ -873,6 +873,12 @@
         </div>
         
         <div id="list-managers" class="space-y-4 pt-3 border-t border-slate-800"></div>
+
+        <div class="pt-2 border-t border-slate-800">
+          <label class="block text-xs font-semibold text-indigo-300 mb-1"><i class="fa-solid fa-fire mr-1"></i> Optional Firebase Config JSON (Live Team Sync)</label>
+          <textarea id="settings-firebase-config" rows="3" placeholder='{"apiKey":"...","authDomain":"...","projectId":"..."}' class="w-full bg-slate-950 font-mono border border-slate-800 rounded-lg p-2 text-[10px] text-slate-300 focus:outline-none focus:border-indigo-500 resize-none"></textarea>
+          <p class="text-[10px] text-slate-500 mt-1">Paste your Firebase web config to connect live real-time DB across all team members.</p>
+        </div>
       </div>
 
       <div class="flex justify-end gap-2 border-t border-slate-800 pt-3">
@@ -930,17 +936,6 @@
 
   <!-- APPLICATION CORE SCRIPT -->
   <script>
-    // Hardcoded Firebase Config
-    const firebaseConfig = {
-      "apiKey": "AIzaSyBdS6DU6a1qAjtwsCONrSXEKZ1IWzJ3RQc",
-      "authDomain": "sponsorship-tracker-4d736.firebaseapp.com",
-      "databaseURL": "https://sponsorship-tracker-4d736-default-rtdb.firebaseio.com",
-      "projectId": "sponsorship-tracker-4d736",
-      "storageBucket": "sponsorship-tracker-4d736.firebasestorage.app",
-      "messagingSenderId": "98189953022",
-      "appId": "1:98189953022:web:9dd323b7e49730c97822af"
-    };
-
     // Global State Container
     window.appState = {
       activeTab: 'kickstart',
@@ -957,7 +952,7 @@
       tiers: [],
       categories: [],
       lastName: '',
-      firebaseConfig: firebaseConfig
+      firebaseConfig: null
     };
 
     const defaultRequirements = [
@@ -1046,7 +1041,6 @@
       window.appState.team = [...defaultTeam];
       window.appState.tiers = clone(defaultTiers);
       window.appState.categories = [...defaultCats];
-      window.appState.firebaseConfig = firebaseConfig;
       saveToLocalStorage();
     }
 
@@ -1108,7 +1102,7 @@
 
           let statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">Needed</span>`;
           if (r.status === 'In Discussion') statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">In Discussion</span>`;
-          if (r.status === 'Secured') statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Secured</span>`;
+          if (r.status === 'Secured') statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Secured 🏆</span>`;
 
           const tr = document.createElement('tr');
           tr.className = "hover:bg-slate-900/60 transition border-b border-slate-800/40";
@@ -1163,19 +1157,6 @@
       renderAll();
       showToast('Loaded standard PKR budget template!', 'success');
       switchTab('requirements');
-    }
-
-    function cycleReqStatus(idx) {
-      const req = window.appState.requirements[idx];
-      if (!req) return;
-      if (req.status === 'Needed') req.status = 'In Discussion';
-      else if (req.status === 'In Discussion') req.status = 'Secured';
-      else req.status = 'Needed';
-
-      saveToLocalStorage();
-      renderAll();
-      showToast(`Updated status for "${req.name}"`, 'info');
-      if (req.status === 'Secured') triggerConfetti();
     }
 
     function renderMeetingsList() {
@@ -1276,33 +1257,6 @@
       showToast('Meeting removed', 'info');
     }
 
-    function convertToClosedWon(meetingId) {
-      const meeting = window.appState.meetings.find(m => m.id === meetingId);
-      if (!meeting) return;
-
-      let lead = window.appState.leads.find(l => l.company.toLowerCase() === meeting.company.toLowerCase());
-      if (lead) {
-        lead.status = 'Closed-Won';
-      } else {
-        window.appState.leads.unshift({
-          id: 'lead_' + Date.now(),
-          company: meeting.company,
-          tier: meeting.tier,
-          value: tierValue(meeting.tier),
-          status: 'Closed-Won',
-          email: '',
-          followup: '',
-          owner: meeting.owner,
-          notes: 'Deal closed after meeting!'
-        });
-      }
-
-      saveToLocalStorage();
-      renderAll();
-      showToast(`Moved ${meeting.company} to Closed-Won!`, 'success');
-      triggerConfetti();
-    }
-
     function renderLeadsTable() {
       const search = (document.getElementById('lead-search').value || '').toLowerCase();
       const statusFilter = document.getElementById('lead-status-filter').value;
@@ -1353,7 +1307,7 @@
 
     function getStatusBadge(status) {
       switch (status) {
-        case 'Closed-Won': return `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Closed-Won</span>`;
+        case 'Closed-Won': return `<span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Closed-Won 🏆</span>`;
         case 'Closed-Lost': return `<span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">Closed-Lost</span>`;
         case 'Meeting Scheduled': return `<span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">Meeting Scheduled</span>`;
         case 'Pitch Sent': return `<span class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Pitch Sent</span>`;
@@ -1540,77 +1494,6 @@
       showToast('Reset roadmap to standard blueprint.', 'info');
     }
 
-    function exportToCSV() {
-      const leads = window.appState.leads || [];
-      if (leads.length === 0) {
-        showToast('No leads available to export.', 'warning');
-        return;
-      }
-
-      let csvContent = "data:text/csv;charset=utf-8,Company,Tier,Value,Status,Email,FollowUp,Owner,Notes\n";
-
-      leads.forEach(l => {
-        const row = [
-          `"${(l.company || '').replace(/"/g, '""')}"`,
-          `"${(l.tier || '').replace(/"/g, '""')}"`,
-          l.value || 0,
-          `"${(l.status || '').replace(/"/g, '""')}"`,
-          `"${(l.email || '').replace(/"/g, '""')}"`,
-          `"${(l.followup || '').replace(/"/g, '""')}"`,
-          `"${(l.owner || '').replace(/"/g, '""')}"`,
-          `"${(l.notes || '').replace(/"/g, '""')}"`
-        ].join(",");
-        csvContent += row + "\n";
-      });
-
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `sponsorpulse_leads_${new Date().toISOString().slice(0, 10)}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      showToast('CSV Exported successfully!', 'success');
-    }
-
-    function handleCSVImport() {
-      const text = document.getElementById('csv-paste-area').value.trim();
-      if (!text) {
-        showToast('Please paste CSV text first.', 'warning');
-        return;
-      }
-
-      const lines = text.split('\n');
-      let importedCount = 0;
-
-      lines.forEach((line, index) => {
-        if (index === 0 && line.toLowerCase().includes('company')) return;
-
-        const parts = line.split(',').map(s => s.trim().replace(/^"|"$/g, ''));
-        if (parts.length >= 2 && parts[0]) {
-          window.appState.leads.push({
-            id: 'lead_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-            company: parts[0],
-            tier: parts[1] || 'Silver Sponsor',
-            value: parseFloat(parts[2]) || 50000,
-            status: parts[3] || 'Prospect',
-            email: parts[4] || '',
-            followup: parts[5] || '',
-            owner: parts[6] || 'You',
-            notes: parts[7] || 'Imported from CSV'
-          });
-          importedCount++;
-        }
-      });
-
-      closeModal('import-csv-modal');
-      document.getElementById('csv-paste-area').value = '';
-      saveToLocalStorage();
-      renderAll();
-      showToast(`Successfully imported ${importedCount} sponsor leads!`, 'success');
-    }
-
     function saveGoogleSheetURL() {
       const url = document.getElementById('google-sheet-url').value;
       localStorage.setItem('sponsor_pulse_sheet_url', url);
@@ -1635,7 +1518,7 @@
       const loadingId = appendChatLoading();
 
       try {
-        const apiKey = "";
+        const apiKey = ""; // Insert Gemini API key if available
         if (!apiKey) {
           setTimeout(() => {
             removeChatLoading(loadingId);
@@ -1792,7 +1675,7 @@
           tiers: a.tiers,
           categories: a.categories,
           lastName: a.lastName,
-          firebaseConfig: firebaseConfig
+          firebaseConfig: a.firebaseConfig
         }));
       } catch(e) {
         showToast('Could not save data (browser storage blocked or full)', 'warning');
@@ -1800,224 +1683,163 @@
     }
 
     function loadLocalStorage() {
+      const a = S();
+      let d = null;
       try {
-        const raw = localStorage.getItem('sponsorpulse_pk_data');
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (parsed) {
-            window.appState.requirements = Array.isArray(parsed.requirements) ? parsed.requirements : clone(defaultRequirements);
-            window.appState.meetings = Array.isArray(parsed.meetings) ? parsed.meetings : clone(defaultMeetings);
-            window.appState.leads = Array.isArray(parsed.leads) ? parsed.leads : clone(defaultLeads);
-            window.appState.weeklyPlan = Array.isArray(parsed.weeklyPlan) ? parsed.weeklyPlan : clone(defaultWeeklyPlan);
-            window.appState.notes = Array.isArray(parsed.notes) ? parsed.notes : clone(defaultNotes);
-            window.appState.team = Array.isArray(parsed.team) && parsed.team.length ? parsed.team : [...defaultTeam];
-            window.appState.tiers = Array.isArray(parsed.tiers) && parsed.tiers.length ? parsed.tiers : clone(defaultTiers);
-            window.appState.categories = Array.isArray(parsed.categories) && parsed.categories.length ? parsed.categories : [...defaultCats];
-            window.appState.targetGoal = parsed.targetGoal || 500000;
-            window.appState.currencySymbol = parsed.currencySymbol || 'Rs. ';
-            window.appState.daysRemaining = parsed.daysRemaining !== undefined ? parsed.daysRemaining : 30;
-            window.appState.lastName = parsed.lastName || '';
-          }
-        } else {
-          resetToDefaults();
-        }
-      } catch (e) {
-        console.error("Error loading local storage:", e);
-        resetToDefaults();
+        d = JSON.parse(localStorage.getItem('sponsorpulse_pk_data') || 'null');
+      } catch(e) {
+        console.error(e);
       }
-
-      const savedSheetUrl = localStorage.getItem('sponsor_pulse_sheet_url');
-      if (savedSheetUrl) {
-        const el = document.getElementById('google-sheet-url');
-        if (el) el.value = savedSheetUrl;
-      }
+      d = d || {};
+      a.requirements = d.requirements || clone(defaultRequirements);
+      a.meetings = d.meetings || clone(defaultMeetings);
+      a.leads = d.leads || clone(defaultLeads);
+      a.weeklyPlan = d.weeklyPlan || clone(defaultWeeklyPlan);
+      a.targetGoal = d.targetGoal ?? 500000;
+      a.currencySymbol = d.currencySymbol || 'Rs. ';
+      a.daysRemaining = d.daysRemaining ?? 30;
+      a.notes = d.notes || clone(defaultNotes);
+      a.team = d.team || [...defaultTeam];
+      a.tiers = d.tiers || clone(defaultTiers);
+      a.categories = d.categories || [...defaultCats];
+      a.lastName = d.lastName || '';
+      a.firebaseConfig = d.firebaseConfig || null;
     }
 
-    /* ===== Modal & UI Helpers ===== */
-    function openModal(id) {
-      const el = document.getElementById(id);
-      if (el) el.classList.remove('hidden');
+    /* ===== Cycle Requirement Status ===== */
+    function cycleReqStatus(idx) {
+      const statuses = ['Needed', 'In Discussion', 'Secured'];
+      const current = window.appState.requirements[idx].status || 'Needed';
+      const nextIdx = (statuses.indexOf(current) + 1) % statuses.length;
+      window.appState.requirements[idx].status = statuses[nextIdx];
+      saveToLocalStorage();
+      renderAll();
+      showToast(`Requirement status changed to ${statuses[nextIdx]}`, 'info');
+      if (statuses[nextIdx] === 'Secured') triggerConfetti();
     }
 
-    function closeModal(id) {
-      const el = document.getElementById(id);
-      if (el) el.classList.add('hidden');
+    /* ===== Convert Meeting to Closed-Won ===== */
+    function convertToClosedWon(meetingId) {
+      const meeting = window.appState.meetings.find(m => m.id === meetingId);
+      if (!meeting) return;
+
+      let lead = window.appState.leads.find(l => l.company.toLowerCase() === meeting.company.toLowerCase());
+      if (lead) {
+        lead.status = 'Closed-Won';
+      } else {
+        window.appState.leads.unshift({
+          id: 'lead_' + Date.now(),
+          company: meeting.company,
+          tier: meeting.tier,
+          value: tierValue(meeting.tier),
+          status: 'Closed-Won',
+          email: '',
+          followup: '',
+          owner: meeting.owner,
+          notes: meeting.agenda || 'Closed from meeting pitch.'
+        });
+      }
+
+      saveToLocalStorage();
+      renderAll();
+      showToast(`Sponsorship with ${meeting.company} marked as Closed-Won! 🎉`, 'success');
+      triggerConfetti();
     }
 
-    function showToast(message, type = 'info') {
-      const container = document.getElementById('toast-container');
-      if (!container) return;
-
-      const toast = document.createElement('div');
-      let bg = 'bg-slate-800 border-slate-700 text-white';
-      let icon = 'fa-info-circle text-indigo-400';
-
-      if (type === 'success') {
-        bg = 'bg-slate-900 border-emerald-500/50 text-emerald-300';
-        icon = 'fa-circle-check text-emerald-400';
-      } else if (type === 'warning') {
-        bg = 'bg-slate-900 border-amber-500/50 text-amber-300';
-        icon = 'fa-triangle-exclamation text-amber-400';
-      } else if (type === 'error') {
-        bg = 'bg-slate-900 border-rose-500/50 text-rose-300';
-        icon = 'fa-circle-xmark text-rose-400';
-      }
-
-      toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl border text-xs font-semibold shadow-2xl transition-all duration-300 transform translate-y-2 opacity-0 ${bg}`;
-      toast.innerHTML = `<i class="fa-solid ${icon} text-sm"></i> <span>${esc(message)}</span>`;
-
-      container.appendChild(toast);
-
-      setTimeout(() => {
-        toast.classList.remove('translate-y-2', 'opacity-0');
-      }, 10);
-
-      setTimeout(() => {
-        toast.classList.add('opacity-0', 'translate-y-2');
-        setTimeout(() => toast.remove(), 300);
-      }, 3500);
-    }
-
-    function fillSelects() {
-      const a = window.appState;
-
-      const reqCatSelect = document.getElementById('req-category');
-      if (reqCatSelect) {
-        reqCatSelect.innerHTML = a.categories.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
-      }
-
-      const meetingTierSelect = document.getElementById('meeting-tier');
-      if (meetingTierSelect) {
-        meetingTierSelect.innerHTML = a.tiers.map(t => `<option value="${esc(t.name)}">${esc(t.name)} (${a.currencySymbol}${Number(t.value).toLocaleString()})</option>`).join('');
-      }
-
-      const leadTierSelect = document.getElementById('lead-tier');
-      if (leadTierSelect) {
-        leadTierSelect.innerHTML = a.tiers.map(t => `<option value="${esc(t.name)}">${esc(t.name)} (${a.currencySymbol}${Number(t.value).toLocaleString()})</option>`).join('');
-      }
-
-      const meetingOwnerSelect = document.getElementById('meeting-owner');
-      if (meetingOwnerSelect) {
-        meetingOwnerSelect.innerHTML = a.team.map(m => `<option value="${esc(m)}">${esc(m)}</option>`).join('');
-      }
-
-      const leadOwnerSelect = document.getElementById('lead-owner');
-      if (leadOwnerSelect) {
-        leadOwnerSelect.innerHTML = a.team.map(m => `<option value="${esc(m)}">${esc(m)}</option>`).join('');
-      }
-
-      const datalist = document.getElementById('team-datalist');
-      if (datalist) {
-        datalist.innerHTML = a.team.map(m => `<option value="${esc(m)}"></option>`).join('');
-      }
-    }
-
-    /* ===== Notes & Requirements Module ===== */
-    let currentNoteToCompleteId = null;
+    /* ===== Notes & Requirements Management ===== */
+    let activeCompleteNoteId = null;
 
     function renderNotes() {
       const notes = window.appState.notes || [];
-      const pendingContainer = document.getElementById('notes-pending-list');
-      const doneContainer = document.getElementById('notes-done-list');
-      const pendingBadge = document.getElementById('notes-pending-count');
-      const doneBadge = document.getElementById('notes-done-count');
-      const tabBadge = document.getElementById('notes-badge');
+      const pendingList = document.getElementById('notes-pending-list');
+      const doneList = document.getElementById('notes-done-list');
+      const badge = document.getElementById('notes-badge');
 
       const pending = notes.filter(n => !n.done);
       const done = notes.filter(n => n.done);
 
-      if (pendingBadge) pendingBadge.innerText = pending.length;
-      if (doneBadge) doneBadge.innerText = done.length;
+      document.getElementById('notes-pending-count').innerText = pending.length;
+      document.getElementById('notes-done-count').innerText = done.length;
 
-      if (tabBadge) {
-        if (pending.length > 0) {
-          tabBadge.innerText = pending.length;
-          tabBadge.classList.remove('hidden');
-          tabBadge.classList.add('inline-flex');
-        } else {
-          tabBadge.classList.add('hidden');
-          tabBadge.classList.remove('inline-flex');
-        }
+      if (pending.length > 0) {
+        badge.classList.remove('hidden');
+        badge.classList.add('flex');
+        badge.innerText = pending.length;
+      } else {
+        badge.classList.add('hidden');
+        badge.classList.remove('flex');
       }
 
-      if (pendingContainer) {
-        if (pending.length === 0) {
-          pendingContainer.innerHTML = `<div class="p-4 text-center text-xs text-slate-500 glass-card rounded-xl">No pending notes or tasks. Add one above!</div>`;
-        } else {
-          pendingContainer.innerHTML = pending.map(n => {
-            let pColor = 'bg-slate-800 text-slate-300 border-slate-700';
-            if (n.priority === 'High') pColor = 'bg-rose-500/10 text-rose-300 border-rose-500/20';
-            if (n.priority === 'Low') pColor = 'bg-slate-800 text-slate-400 border-slate-700/60';
-
+      pendingList.innerHTML = pending.length === 0 
+        ? '<p class="text-xs text-slate-500 py-4 text-center">No pending notes or requirements.</p>'
+        : pending.map(n => {
+            const priorityColor = n.priority === 'High' ? 'bg-rose-500/20 text-rose-300 border-rose-500/30' : (n.priority === 'Low' ? 'bg-slate-800 text-slate-400 border-slate-700' : 'bg-amber-500/20 text-amber-300 border-amber-500/30');
             return `
-              <div class="glass-card p-3 rounded-xl border border-slate-800 flex items-start justify-between gap-3 group hover:border-slate-700 transition">
-                <div class="space-y-1.5 flex-1">
+              <div class="glass-card p-3 rounded-xl border border-slate-800 flex items-center justify-between gap-3 note-in">
+                <div class="space-y-1 flex-1">
                   <div class="flex items-center gap-2">
-                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${n.kind === 'Requirement' ? 'bg-cyan-500/10 text-cyan-300 border border-cyan-500/20' : 'bg-indigo-500/10 text-indigo-300 border border-indigo-500/20'}">${esc(n.kind)}</span>
-                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${pColor}">${esc(n.priority || 'Medium')} Priority</span>
+                    <span class="px-2 py-0.5 text-[10px] font-bold rounded border ${priorityColor}">${esc(n.priority || 'Medium')}</span>
+                    <span class="px-2 py-0.5 text-[10px] font-semibold rounded bg-slate-800 text-slate-300">${esc(n.kind || 'Note')}</span>
                   </div>
-                  <p class="text-xs text-slate-200 font-medium leading-relaxed break-words">${esc(n.text)}</p>
+                  <p class="text-xs text-slate-200">${esc(n.text)}</p>
                 </div>
-                <div class="flex items-center gap-1 shrink-0">
-                  <button onclick="promptCompleteNote('${n.id}')" class="px-2.5 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/30 text-xs font-semibold transition flex items-center gap-1">
-                    <i class="fa-solid fa-check"></i> Done
+                <div class="flex items-center gap-2">
+                  <button onclick="openCompleteNoteModal('${n.id}')" class="px-2.5 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 rounded-lg text-xs font-bold transition flex items-center gap-1">
+                    <i class="fa-solid fa-check"></i> Complete
                   </button>
-                  <button onclick="deleteNote('${n.id}')" class="p-1.5 text-slate-500 hover:text-rose-400 transition"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                  <button onclick="deleteNote('${n.id}')" class="p-1.5 text-slate-500 hover:text-rose-400 transition">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
                 </div>
               </div>
             `;
           }).join('');
-        }
-      }
 
-      if (doneContainer) {
-        if (done.length === 0) {
-          doneContainer.innerHTML = `<div class="p-4 text-center text-xs text-slate-500 glass-card rounded-xl">No completed items yet.</div>`;
-        } else {
-          doneContainer.innerHTML = done.map(n => `
-            <div class="glass-card p-3 rounded-xl border border-slate-800/60 bg-slate-900/40 flex items-start justify-between gap-3 opacity-75">
+      doneList.innerHTML = done.length === 0
+        ? '<p class="text-xs text-slate-500 py-4 text-center">No completed items yet.</p>'
+        : done.map(n => `
+            <div class="glass-card p-3 rounded-xl border border-slate-800/60 flex items-center justify-between gap-3 opacity-75">
               <div class="space-y-1 flex-1">
-                <p class="text-xs text-slate-400 line-through leading-relaxed break-words">${esc(n.text)}</p>
-                <div class="flex items-center gap-2 text-[10px] text-emerald-400">
-                  <span><i class="fa-solid fa-circle-check"></i> Completed by <strong>${esc(n.completedBy || 'Team Member')}</strong></span>
-                </div>
+                <p class="text-xs text-slate-400 line-through">${esc(n.text)}</p>
+                <p class="text-[10px] text-emerald-400 font-medium">
+                  <i class="fa-solid fa-circle-check mr-1"></i> Completed by <span class="font-bold">${esc(n.doneBy || 'Team Member')}</span>
+                </p>
               </div>
-              <button onclick="deleteNote('${n.id}')" class="p-1.5 text-slate-600 hover:text-rose-400 transition"><i class="fa-solid fa-trash-can text-xs"></i></button>
+              <button onclick="deleteNote('${n.id}')" class="p-1.5 text-slate-500 hover:text-rose-400 transition">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
             </div>
           `).join('');
-        }
-      }
     }
 
     function handleAddNote(e) {
       e.preventDefault();
       const textEl = document.getElementById('note-text');
-      const kindEl = document.getElementById('note-kind');
-      const priorityEl = document.getElementById('note-priority');
-
       const text = textEl.value.trim();
       if (!text) return;
+
+      const kind = document.getElementById('note-kind').value;
+      const priority = document.getElementById('note-priority').value;
 
       window.appState.notes.unshift({
         id: 'n_' + Date.now(),
         text,
-        kind: kindEl.value,
-        priority: priorityEl.value,
+        kind,
+        priority,
         created: Date.now(),
         done: false
       });
 
       textEl.value = '';
       saveToLocalStorage();
-      renderNotes();
-      showToast('Note added!', 'success');
+      renderAll();
+      showToast('Note added', 'success');
     }
 
-    function promptCompleteNote(id) {
+    function openCompleteNoteModal(id) {
       const note = window.appState.notes.find(n => n.id === id);
       if (!note) return;
-
-      currentNoteToCompleteId = id;
+      activeCompleteNoteId = id;
       document.getElementById('complete-note-text').innerText = note.text;
       document.getElementById('complete-name').value = window.appState.lastName || '';
       openModal('complete-note-modal');
@@ -2026,115 +1848,137 @@
     function submitComplete(e) {
       e.preventDefault();
       const name = document.getElementById('complete-name').value.trim();
-      if (!name || !currentNoteToCompleteId) return;
+      if (!name || !activeCompleteNoteId) return;
 
-      const note = window.appState.notes.find(n => n.id === currentNoteToCompleteId);
+      const note = window.appState.notes.find(n => n.id === activeCompleteNoteId);
       if (note) {
         note.done = true;
-        note.completedBy = name;
+        note.doneBy = name;
+        note.doneAt = Date.now();
         window.appState.lastName = name;
-
-        if (!window.appState.team.includes(name)) {
-          window.appState.team.push(name);
-        }
       }
 
       closeModal('complete-note-modal');
+      activeCompleteNoteId = null;
       saveToLocalStorage();
       renderAll();
-      showToast('Marked task completed!', 'success');
-      triggerConfetti();
-    }
-
-    function deleteNote(id) {
-      window.appState.notes = window.appState.notes.filter(n => n.id !== id);
-      saveToLocalStorage();
-      renderNotes();
-      showToast('Note deleted', 'info');
+      showToast('Task marked as completed!', 'success');
     }
 
     function clearCompletedNotes() {
       window.appState.notes = window.appState.notes.filter(n => !n.done);
       saveToLocalStorage();
-      renderNotes();
+      renderAll();
       showToast('Cleared completed notes', 'info');
     }
 
-    /* ===== Settings & List Managers ===== */
+    function deleteNote(id) {
+      window.appState.notes = window.appState.notes.filter(n => n.id !== id);
+      saveToLocalStorage();
+      renderAll();
+      showToast('Note deleted', 'info');
+    }
+
+    /* ===== Fill Dropdowns & Selects ===== */
+    function fillSelects() {
+      const a = S();
+      
+      const teamDataList = document.getElementById('team-datalist');
+      if (teamDataList) {
+        teamDataList.innerHTML = a.team.map(t => `<option value="${esc(t)}">`).join('');
+      }
+
+      const meetingOwnerSelect = document.getElementById('meeting-owner');
+      if (meetingOwnerSelect) {
+        const current = meetingOwnerSelect.value;
+        meetingOwnerSelect.innerHTML = a.team.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('');
+        if (current && a.team.includes(current)) meetingOwnerSelect.value = current;
+      }
+
+      const leadOwnerSelect = document.getElementById('lead-owner');
+      if (leadOwnerSelect) {
+        const current = leadOwnerSelect.value;
+        leadOwnerSelect.innerHTML = a.team.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('');
+        if (current && a.team.includes(current)) leadOwnerSelect.value = current;
+      }
+
+      const reqCategorySelect = document.getElementById('req-category');
+      if (reqCategorySelect) {
+        const current = reqCategorySelect.value;
+        reqCategorySelect.innerHTML = a.categories.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+        if (current && a.categories.includes(current)) reqCategorySelect.value = current;
+      }
+
+      const leadTierSelect = document.getElementById('lead-tier');
+      if (leadTierSelect) {
+        const current = leadTierSelect.value;
+        leadTierSelect.innerHTML = a.tiers.map(t => `<option value="${esc(t.name)}">${esc(t.name)} (${a.currencySymbol}${Number(t.value).toLocaleString()})</option>`).join('');
+        if (current) leadTierSelect.value = current;
+      }
+
+      const meetingTierSelect = document.getElementById('meeting-tier');
+      if (meetingTierSelect) {
+        const current = meetingTierSelect.value;
+        meetingTierSelect.innerHTML = a.tiers.map(t => `<option value="${esc(t.name)}">${esc(t.name)}</option>`).join('');
+        if (current) meetingTierSelect.value = current;
+      }
+    }
+
+    /* ===== Settings Modal & List Managers ===== */
+    let activeQuickType = null;
+
     function openSettings() {
-      const a = window.appState;
+      const a = S();
       document.getElementById('settings-target').value = a.targetGoal;
       document.getElementById('settings-currency').value = a.currencySymbol;
       document.getElementById('settings-days').value = a.daysRemaining;
+      document.getElementById('settings-firebase-config').value = a.firebaseConfig ? JSON.stringify(a.firebaseConfig) : '';
 
-      renderListManagers();
+      renderSettingsListManagers();
       openModal('settings-modal');
     }
 
-    function saveSettings() {
-      const target = parseFloat(document.getElementById('settings-target').value) || 500000;
-      const currency = document.getElementById('settings-currency').value || 'Rs. ';
-      const days = parseInt(document.getElementById('settings-days').value) || 30;
-
-      window.appState.targetGoal = target;
-      window.appState.currencySymbol = currency;
-      window.appState.daysRemaining = days;
-
-      closeModal('settings-modal');
-      saveToLocalStorage();
-      renderAll();
-      showToast('Settings saved successfully!', 'success');
-    }
-
-    let activeQuickType = null;
-
-    function renderListManagers() {
+    function renderSettingsListManagers() {
+      const a = S();
       const container = document.getElementById('list-managers');
-      if (!container) return;
-
-      const a = window.appState;
-
       container.innerHTML = `
         <div class="space-y-2">
-          <div class="flex items-center justify-between">
-            <label class="text-xs font-bold text-slate-300">Team Members (${a.team.length})</label>
-            <button type="button" onclick="openQuickModal('team')" class="text-[11px] font-bold text-indigo-400 hover:text-indigo-300"><i class="fa-solid fa-plus mr-1"></i>Add Member</button>
+          <div class="flex justify-between items-center">
+            <label class="text-xs font-semibold text-slate-300">Team Members</label>
+            <button onclick="openQuickAdd('team')" class="text-[11px] text-indigo-400 hover:underline"><i class="fa-solid fa-plus"></i> Add Member</button>
           </div>
-          <div class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-2 bg-slate-950 rounded-lg border border-slate-800">
-            ${a.team.map((m, idx) => `
-              <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-slate-800 text-slate-200 text-[11px] border border-slate-700">
-                ${esc(m)}
-                <button type="button" onclick="deleteListItem('team', ${idx})" class="text-slate-400 hover:text-rose-400"><i class="fa-solid fa-xmark text-[10px]"></i></button>
+          <div class="flex flex-wrap gap-1.5">
+            ${a.team.map((t, idx) => `
+              <span class="px-2 py-1 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-300 flex items-center gap-1.5">
+                ${esc(t)}${a.team.length > 1 ? `<button onclick="removeTeamMember(${idx})" class="text-slate-500 hover:text-rose-400"><i class="fa-solid fa-xmark"></i></button>` : ''}
               </span>
             `).join('')}
           </div>
         </div>
 
-        <div class="space-y-2">
-          <div class="flex items-center justify-between">
-            <label class="text-xs font-bold text-slate-300">Sponsorship Tiers (${a.tiers.length})</label>
-            <button type="button" onclick="openQuickModal('tier')" class="text-[11px] font-bold text-indigo-400 hover:text-indigo-300"><i class="fa-solid fa-plus mr-1"></i>Add Tier</button>
+        <div class="space-y-2 pt-2">
+          <div class="flex justify-between items-center">
+            <label class="text-xs font-semibold text-slate-300">Sponsorship Tiers</label>
+            <button onclick="openQuickAdd('tier')" class="text-[11px] text-indigo-400 hover:underline"><i class="fa-solid fa-plus"></i> Add Tier</button>
           </div>
-          <div class="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto p-2 bg-slate-950 rounded-lg border border-slate-800">
+          <div class="flex flex-wrap gap-1.5">
             ${a.tiers.map((t, idx) => `
-              <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-slate-800 text-slate-200 text-[11px] border border-slate-700">
-                <strong>${esc(t.name)}</strong> (${a.currencySymbol}${Number(t.value).toLocaleString()})
-                <button type="button" onclick="deleteListItem('tier', ${idx})" class="text-slate-400 hover:text-rose-400"><i class="fa-solid fa-xmark text-[10px]"></i></button>
+              <span class="px-2 py-1 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-300 flex items-center gap-1.5">
+                ${esc(t.name)} (${a.currencySymbol}${Number(t.value).toLocaleString()})${a.tiers.length > 1 ? `<button onclick="removeTier(${idx})" class="text-slate-500 hover:text-rose-400"><i class="fa-solid fa-xmark"></i></button>` : ''}
               </span>
             `).join('')}
           </div>
         </div>
 
-        <div class="space-y-2">
-          <div class="flex items-center justify-between">
-            <label class="text-xs font-bold text-slate-300">Requirement Categories (${a.categories.length})</label>
-            <button type="button" onclick="openQuickModal('category')" class="text-[11px] font-bold text-indigo-400 hover:text-indigo-300"><i class="fa-solid fa-plus mr-1"></i>Add Category</button>
+        <div class="space-y-2 pt-2">
+          <div class="flex justify-between items-center">
+            <label class="text-xs font-semibold text-slate-300">Budget Categories</label>
+            <button onclick="openQuickAdd('category')" class="text-[11px] text-indigo-400 hover:underline"><i class="fa-solid fa-plus"></i> Add Category</button>
           </div>
-          <div class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-2 bg-slate-950 rounded-lg border border-slate-800">
+          <div class="flex flex-wrap gap-1.5">
             ${a.categories.map((c, idx) => `
-              <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-slate-800 text-slate-200 text-[11px] border border-slate-700">
-                ${esc(c)}
-                <button type="button" onclick="deleteListItem('category', ${idx})" class="text-slate-400 hover:text-rose-400"><i class="fa-solid fa-xmark text-[10px]"></i></button>
+              <span class="px-2 py-1 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-300 flex items-center gap-1.5">
+                ${esc(c)}${a.categories.length > 1 ? `<button onclick="removeCategory(${idx})" class="text-slate-500 hover:text-rose-400"><i class="fa-solid fa-xmark"></i></button>` : ''}
               </span>
             `).join('')}
           </div>
@@ -2142,29 +1986,41 @@
       `;
     }
 
-    function openQuickModal(type) {
+    function saveSettings() {
+      const a = S();
+      a.targetGoal = parseFloat(document.getElementById('settings-target').value) || 500000;
+      a.currencySymbol = document.getElementById('settings-currency').value || 'Rs. ';
+      a.daysRemaining = parseInt(document.getElementById('settings-days').value) || 30;
+
+      const fbRaw = document.getElementById('settings-firebase-config').value.trim();
+      if (fbRaw) {
+        try {
+          a.firebaseConfig = JSON.parse(fbRaw);
+        } catch(e) {
+          showToast('Invalid Firebase Config JSON format', 'warning');
+        }
+      } else {
+        a.firebaseConfig = null;
+      }
+
+      saveToLocalStorage();
+      renderAll();
+      closeModal('settings-modal');
+      showToast('Settings saved successfully', 'success');
+    }
+
+    function openQuickAdd(type) {
       activeQuickType = type;
-      const titleEl = document.getElementById('quick-title');
-      const valWrap = document.getElementById('quick-value-wrap');
-      const nameInput = document.getElementById('quick-name');
-      const valInput = document.getElementById('quick-value');
-
-      nameInput.value = '';
-      valInput.value = '';
-
-      if (type === 'team') {
-        titleEl.innerText = "Add Team Member";
-        valWrap.classList.add('hidden');
-        nameInput.placeholder = "e.g., Bilal (Operations)";
-      } else if (type === 'tier') {
-        titleEl.innerText = "Add Sponsorship Tier";
-        valWrap.classList.remove('hidden');
-        nameInput.placeholder = "e.g., Diamond Sponsor";
-        valInput.placeholder = "300000";
-      } else if (type === 'category') {
-        titleEl.innerText = "Add Expense Category";
-        valWrap.classList.add('hidden');
-        nameInput.placeholder = "e.g., Logistics & Transport";
+      const titleMap = { team: 'Add Team Member', tier: 'Add Sponsorship Tier', category: 'Add Budget Category' };
+      document.getElementById('quick-title').innerText = titleMap[type] || 'Add';
+      document.getElementById('quick-name').value = '';
+      
+      const valueWrap = document.getElementById('quick-value-wrap');
+      if (type === 'tier') {
+        valueWrap.classList.remove('hidden');
+        document.getElementById('quick-value').value = 50000;
+      } else {
+        valueWrap.classList.add('hidden');
       }
 
       openModal('quick-add-modal');
@@ -2173,33 +2029,149 @@
     function submitQuick(e) {
       e.preventDefault();
       const name = document.getElementById('quick-name').value.trim();
-      const value = parseFloat(document.getElementById('quick-value').value) || 0;
+      if (!name || !activeQuickType) return;
 
-      if (!name) return;
-
+      const a = S();
       if (activeQuickType === 'team') {
-        if (!window.appState.team.includes(name)) window.appState.team.push(name);
+        if (!a.team.includes(name)) a.team.push(name);
       } else if (activeQuickType === 'tier') {
-        window.appState.tiers.push({ name, value });
+        const val = parseFloat(document.getElementById('quick-value').value) || 50000;
+        if (!a.tiers.some(t => t.name.toLowerCase() === name.toLowerCase())) {
+          a.tiers.push({ name, value: val });
+        }
       } else if (activeQuickType === 'category') {
-        if (!window.appState.categories.includes(name)) window.appState.categories.push(name);
+        if (!a.categories.includes(name)) a.categories.push(name);
       }
 
       closeModal('quick-add-modal');
       saveToLocalStorage();
-      renderListManagers();
       fillSelects();
-      showToast('Item added successfully!', 'success');
+      renderSettingsListManagers();
+      showToast('Added item', 'success');
     }
 
-    function deleteListItem(type, idx) {
-      if (type === 'team') window.appState.team.splice(idx, 1);
-      else if (type === 'tier') window.appState.tiers.splice(idx, 1);
-      else if (type === 'category') window.appState.categories.splice(idx, 1);
-
+    function removeTeamMember(idx) {
+      window.appState.team.splice(idx, 1);
       saveToLocalStorage();
-      renderListManagers();
       fillSelects();
+      renderSettingsListManagers();
+    }
+
+    function removeTier(idx) {
+      window.appState.tiers.splice(idx, 1);
+      saveToLocalStorage();
+      fillSelects();
+      renderSettingsListManagers();
+    }
+
+    function removeCategory(idx) {
+      window.appState.categories.splice(idx, 1);
+      saveToLocalStorage();
+      fillSelects();
+      renderSettingsListManagers();
+    }
+
+    /* ===== CSV Export & Import ===== */
+    function exportToCSV() {
+      const leads = window.appState.leads || [];
+      if (leads.length === 0) {
+        showToast('No leads available to export.', 'warning');
+        return;
+      }
+
+      let csv = 'Company,Target Tier,Deal Value (Rs.),Status,Email,FollowUp Date,Owner,Notes\n';
+      leads.forEach(l => {
+        csv += `"${(l.company||'').replace(/"/g, '""')}","${(l.tier||'').replace(/"/g, '""')}",${l.value||0},"${(l.status||'').replace(/"/g, '""')}","${(l.email||'').replace(/"/g, '""')}","${(l.followup||'').replace(/"/g, '""')}","${(l.owner||'').replace(/"/g, '""')}","${(l.notes||'').replace(/"/g, '""')}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute('download', `SponsorPulse_Leads_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('Exported CSV file!', 'success');
+    }
+
+    function handleCSVImport() {
+      const raw = document.getElementById('csv-paste-area').value.trim();
+      if (!raw) {
+        showToast('Please paste valid CSV data first.', 'warning');
+        return;
+      }
+
+      const lines = raw.split('\n');
+      let importedCount = 0;
+
+      lines.forEach((line, idx) => {
+        if (idx === 0 && line.toLowerCase().includes('company')) return;
+        const parts = line.split(',').map(s => s.trim().replace(/^"|"$/g, ''));
+        if (parts.length >= 2 && parts[0]) {
+          window.appState.leads.unshift({
+            id: 'lead_' + Date.now() + '_' + idx,
+            company: parts[0],
+            tier: parts[1] || 'Silver Sponsor',
+            value: parseFloat(parts[2]) || 50000,
+            status: parts[3] || 'Prospect',
+            email: parts[4] || '',
+            followup: parts[5] || '',
+            owner: parts[6] || 'You',
+            notes: parts[7] || 'Imported from CSV'
+          });
+          importedCount++;
+        }
+      });
+
+      closeModal('import-csv-modal');
+      document.getElementById('csv-paste-area').value = '';
+      saveToLocalStorage();
+      renderAll();
+      showToast(`Successfully imported ${importedCount} leads!`, 'success');
+    }
+
+    /* ===== Toast Notification System ===== */
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      const bgMap = {
+        success: 'bg-emerald-900/90 text-emerald-200 border-emerald-500/50',
+        warning: 'bg-amber-900/90 text-amber-200 border-amber-500/50',
+        info: 'bg-indigo-900/90 text-indigo-200 border-indigo-500/50',
+        error: 'bg-rose-900/90 text-rose-200 border-rose-500/50'
+      };
+      const iconMap = {
+        success: 'fa-circle-check',
+        warning: 'fa-triangle-exclamation',
+        info: 'fa-circle-info',
+        error: 'fa-circle-xmark'
+      };
+
+      toast.className = `pointer-events-auto px-4 py-3 rounded-xl border ${bgMap[type] || bgMap.info} shadow-xl backdrop-blur-md text-xs font-semibold flex items-center gap-2.5 transition-all duration-300 transform translate-y-2 opacity-0`;
+      toast.innerHTML = `<i class="fa-solid ${iconMap[type] || iconMap.info} text-sm"></i> <span>${esc(message)}</span>`;
+
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3200);
+    }
+
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.add('hidden');
     }
   </script>
 </body>
